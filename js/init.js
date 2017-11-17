@@ -56,11 +56,11 @@ function getBuffers(gl) {
 }
 
 function getShaders(callback) {
-   loadTextResource("/shaders/vertex.glsl", function (vsError, vsResult) {
+   loadTextResource("shaders/vertex.glsl", function (vsError, vsResult) {
       if (vsError)
          error(vsError);
       else
-         loadTextResource("/shaders/fragment.glsl", function (fsError, fsResult) {
+         loadTextResource("shaders/fragment.glsl", function (fsError, fsResult) {
             if (fsError)
                error(fsError);
             else {
