@@ -24,11 +24,17 @@ let pitch, yaw, roll;
 let mx, my;
 let debug = document.getElementById("debug_text");
 
+
+window.onclick = (event) => {
+   BOARD.onClick(event);
+};
 window.onmousemove = (event) => {
    mx = event.clientX;
    my = event.clientY;
 };
-
+window.ontouchstart = (event) => {
+   window.onclick(event);
+}
 /************************************************
  * LOGIC
  * Computes game logic. The variable delta is
