@@ -21,19 +21,23 @@ function main(canvas, gl, programInfo, matrices, buffers) {
 }
 
 let pitch, yaw, roll;
-let mx, my;
 let debug = document.getElementById("debug_text");
+let clicks = 0,
+   touchstarts = 0,
+   touchends = 0;
 
-window.onload = () => {
-   let canvas = document.getElementById("glCanvas");
-   canvas.onclick = (event) => {
-      BOARD.onClick(event);
-   };
-   canvas.onmousemove = (event) => {
-      mx = event.clientX;
-      my = event.clientY;
-   };
-}
+window.onload = function () {
+
+   document.addEventListener('click', function (event) {
+      clicks++;
+   });
+   document.addEventListener('touchstart', function (event) {
+      touchstarts++;
+   });
+   document.addEventListener('touchend', function (event) {
+      touchends++;
+   });
+};
 /************************************************
  * LOGIC
  * Computes game logic. The variable delta is
@@ -42,6 +46,7 @@ window.onload = () => {
  ************************************************/
 const logic = (delta) => {
    BOARD.logic(delta);
+   debug.innerHTML = "clicks: " + clicks + "<br/>touchstarts: " + touchstarts + "<br/>touchends" + touchends;
 };
 
 const render = (gl, matrices, programInfo, buffers) => {
