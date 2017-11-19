@@ -30,3 +30,7 @@ const toScreenX = (clientX) => (clientX - (width() - height()) / 2) * 1000 / hei
  * space.
  ************************************************/
 const toScreenY = (clientY) => (clientY / height()) * 1000;
+
+const isMobile = () => {
+   return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
