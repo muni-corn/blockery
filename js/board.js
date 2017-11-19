@@ -213,9 +213,9 @@ const BOARD = {
       return false;
    },
 
-   onClick: function (event) {
-      let mx = toScreenX(event.clientX);
-      let my = toScreenY(event.clientY);
+   onClick: function (eventX, eventY) {
+      let mx = toScreenX(eventX);
+      let my = toScreenY(eventY);
       let slotSize = this.BLOCK_WIDTH + this.SPACING;
       let row = Math.floor((my - this.boardCenter.y + (this.getBoardHeight() / 2) - this.SPACING) / slotSize - 1);
       let col = Math.floor((mx - this.boardCenter.x + (this.getBoardWidth() / 2)) / slotSize);

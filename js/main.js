@@ -1,5 +1,5 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global BOARD, intToRGB, toScreenX, toScreenY, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
+/* global BOARD, isMobile, intToRGB, toScreenX, toScreenY, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
 
 
 function main(canvas, gl, programInfo, matrices, buffers) {
@@ -27,17 +27,18 @@ let clicks = 0,
    tsx, tsy, cx, cy, hasTouchStart, hasOnClick;
 
 window.onload = function () {
-   hasTouchStart = 'ontouchstart' in window;
-   hasOnClick = 'onclick' in window;
-   document.addEventListener('click', function (event) {
-      cx = event.clientX;
-      cy = event.clientY;
-      clicks++;
-   });
-   document.addEventListener('touchstart', function (event) {
-      tsx = Math.floor(event.touches[0].clientX);
-      tsy = Math.floor(event.touches[0].clientY);
-      touchstarts++;
+   let listenerType = isMobile() ? "touchstart" : "click";
+   let x, y;
+   document.addEventListener(listenerType, function (event) {
+      if (listenerType === "touchstart") {
+         x = event.touches[0].clientX;
+         y = event.touches[0].clientY;
+      } else {
+         x = event.clientX;
+         y = event.clientY;
+      }
+
+      BOARD.onClick(x, y);
    });
 };
 /************************************************
@@ -48,11 +49,6 @@ window.onload = function () {
  ************************************************/
 const logic = (delta) => {
    BOARD.logic(delta);
-   debug.innerHTML =
-      "clicks: " + clicks + ", last at " + cx + ", " + cy +
-      "<br/>touchstarts: " + touchstarts + ", last at " + tsx + ", " + tsy +
-      "<br/>window has onclick? " + hasOnClick +
-      "<br/>window has touchstart? " + hasTouchStart;
 };
 
 const render = (gl, matrices, programInfo, buffers) => {
