@@ -6,10 +6,10 @@
    z-index: 2;
 }
 
-html, body {
+html,
+body {
    margin: 0px;
    overflow: hidden;
-   cursor: pointer;
 }
 
 #glCanvas {
