@@ -25,15 +25,16 @@ let mx, my;
 let debug = document.getElementById("debug_text");
 
 window.onload = () => {
-   window.onclick = (event) => {
+   let canvas = document.getElementById("glCanvas");
+   canvas.onclick = (event) => {
       BOARD.onClick(event);
    };
-   window.canvas.onmousemove = (event) => {
+   canvas.onmousemove = (event) => {
       mx = event.clientX;
       my = event.clientY;
    };
-   window.canvas.ontouchstart = (event) => {
-      window.canvas.onclick(event);
+   canvas.ontouchstart = (event) => {
+      canvas.onclick(event);
    }
 }
 /************************************************
