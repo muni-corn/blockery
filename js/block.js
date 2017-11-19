@@ -55,19 +55,22 @@ class Block {
             (Math.sin(performance.now() / 1000 + (this.col * -Math.PI / BOARD.COLUMNS)) - 1);
       } else {
          while (delta > 0) {
-            this.yv += GRAVITY / UPDATES_PER_SECOND;
-            this.y += this.yv / UPDATES_PER_SECOND;
+            let spu = 1 / UPDATES_PER_SECOND;
+            let timeSlice = delta < spu ? delta : spu;
+
+            this.yv += GRAVITY * timeSlice;
+            this.y += this.yv * timeSlice;
 
             if (!this.falling && this.y >= maxY) {
                this.yv *= -BOUNCE_FACTOR;
                this.y = maxY;
             } else if (this.falling) {
-               this.pit += this.pitV / UPDATES_PER_SECOND;
-               this.yaw += this.yawV / UPDATES_PER_SECOND;
-               this.rol += this.rolV / UPDATES_PER_SECOND;
-               this.z += this.zv / UPDATES_PER_SECOND;
+               this.pit += this.pitV * timeSlice;
+               this.yaw += this.yawV * timeSlice;
+               this.rol += this.rolV * timeSlice;
+               this.z += this.zv * timeSlice;
             }
-            delta -= 1.0 / UPDATES_PER_SECOND;
+            delta -= timeSlice;
          }
       }
    }
