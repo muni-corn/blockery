@@ -24,16 +24,17 @@ let pitch, yaw, roll;
 let mx, my;
 let debug = document.getElementById("debug_text");
 
-
-window.onclick = (event) => {
-   BOARD.onClick(event);
-};
-window.onmousemove = (event) => {
-   mx = event.clientX;
-   my = event.clientY;
-};
-window.ontouchstart = (event) => {
-   window.onclick(event);
+window.onload = () => {
+   window.onclick = (event) => {
+      BOARD.onClick(event);
+   };
+   window.canvas.onmousemove = (event) => {
+      mx = event.clientX;
+      my = event.clientY;
+   };
+   window.canvas.ontouchstart = (event) => {
+      window.canvas.onclick(event);
+   }
 }
 /************************************************
  * LOGIC
