@@ -3,6 +3,7 @@
 
 window.canvas = document.getElementById("glCanvas");
 window.gl = window.canvas.getContext("webgl");
+if (!window.gl) window.gl = window.canvas.getContext("experimental-webgl");
 if (!window.gl) alert("This browser does not support WebGL.");
 
 const UPDATES_PER_SECOND = 60;
