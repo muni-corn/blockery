@@ -24,18 +24,20 @@ let pitch, yaw, roll;
 let debug = document.getElementById("debug_text");
 let clicks = 0,
    touchstarts = 0,
-   touchends = 0;
+   tsx, tsy, cx, cy, hasTouchStart, hasOnClick;
 
 window.onload = function () {
-
+   hasTouchStart = 'ontouchstart' in window;
+   hasOnClick = 'onclick' in window;
    document.addEventListener('click', function (event) {
+      cx = event.clientX;
+      cy = event.clientY;
       clicks++;
    });
    document.addEventListener('touchstart', function (event) {
+      tsx = Math.floor(event.touches[0].clientX);
+      tsy = Math.floor(event.touches[0].clientY);
       touchstarts++;
-   });
-   document.addEventListener('touchend', function (event) {
-      touchends++;
    });
 };
 /************************************************
@@ -46,7 +48,11 @@ window.onload = function () {
  ************************************************/
 const logic = (delta) => {
    BOARD.logic(delta);
-   debug.innerHTML = "clicks: " + clicks + "<br/>touchstarts: " + touchstarts + "<br/>touchends" + touchends;
+   debug.innerHTML =
+      "clicks: " + clicks + ", last at " + cx + ", " + cy +
+      "<br/>touchstarts: " + touchstarts + ", last at " + tsx + ", " + tsy +
+      "<br/>window has onclick? " + hasOnClick +
+      "<br/>window has touchstart? " + hasTouchStart;
 };
 
 const render = (gl, matrices, programInfo, buffers) => {
