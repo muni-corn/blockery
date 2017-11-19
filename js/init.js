@@ -25,9 +25,6 @@ function init() {
       bindMatrix(matrices.proj, programInfo.uniformLocations.projMatrix);
    };
 
-   window.onclick = (event) => {
-      BOARD.onClick(event);
-   };
 
    getShaders((result) => {
       shaders = result;
