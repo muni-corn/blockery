@@ -1,4 +1,5 @@
 /* jshint esversion: 6, browser: true, devel: true */
+/* global VISIBLE_HEIGHT */
 
 const intToRGB = (rgb) => {
    // 0xrrggbb
@@ -16,20 +17,36 @@ const width = () => window.innerWidth;
 const height = () => window.innerHeight;
 
 /************************************************
- * TO SCREEN X
+ * TO GL X
  * Converts an x-coordinate in the browser window
  * to an x-coordinate usable in the WebGL matrix
  * space.
  ************************************************/
-const toScreenX = (clientX) => (clientX - (width() - height()) / 2) * 1000 / height();
+const toGLX = (clientX) => (clientX - (width() - height()) / 2) * VISIBLE_HEIGHT / height();
 
 /************************************************
- * TO SCREEN Y
+ * TO GL Y
  * Converts an y-coordinate in the browser window
  * to an y-coordinate usable in the WebGL matrix
  * space.
  ************************************************/
-const toScreenY = (clientY) => (clientY / height()) * 1000;
+const toGLY = (clientY) => (clientY / height()) * VISIBLE_HEIGHT;
+
+/************************************************
+ * TO BROWSER X
+ * Converts an x-coordinate in the WebGL matrix
+ * space to an x-coordinate usable in the browser
+ * window.
+ ************************************************/
+const toBrowserX = (glX) => (glX * height() / VISIBLE_HEIGHT) + ((width() - height()) / 2);
+
+/************************************************
+ * TO BROWSER Y
+ * Converts an y-coordinate in the WebGL matrix
+ * space to an y-coordinate usable in the browser
+ * window.
+ ************************************************/
+const toBrowserY = (glY) => glY * height() / VISIBLE_HEIGHT;
 
 const isMobile = () => {
    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
