@@ -1,16 +1,26 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global BOARD, mat4, glMatrix, main, CUBE_MESH */
+/* global BOARD, DATA, mat4, glMatrix, main, CUBE_MESH */
 
-window.canvas = document.getElementById("glCanvas");
-window.gl = window.canvas.getContext("webgl");
-if (!window.gl) window.gl = window.canvas.getContext("experimental-webgl");
+window.glCanvas = document.getElementById("glCanvas");
+window.canvas2d = document.getElementById("canvas2d");
+window.gl = window.glCanvas.getContext("webgl");
+window.ctx2d = window.canvas2d.getContext('2d');
+
+if (!window.ctx2d) alert("This browser does not support canvas drawing");
+if (!window.gl) window.gl = window.glCanvas.getContext("experimental-webgl");
 if (!window.gl) alert("This browser does not support WebGL.");
 
+const VISIBLE_HEIGHT = 1000;
+const VISIBLE_WIDTH = VISIBLE_HEIGHT * 9 / 16;
 const UPDATES_PER_SECOND = 60;
 
 function init() {
+   DATA.load();
+
    let gl = window.gl;
-   let canvas = window.canvas;
+   let glCanvas = window.glCanvas;
+   let ctx2d = window.ctx2d;
+   let canvas2d = window.canvas2d;
 
    let shaders;
    let buffers;
@@ -18,9 +28,13 @@ function init() {
    let programInfo;
 
    window.onresize = () => {
-      window.canvas.width = window.innerWidth;
-      window.canvas.height = window.innerHeight;
-      gl.viewport(0, 0, canvas.width, canvas.height);
+      window.glCanvas.width = window.innerWidth;
+      window.glCanvas.height = window.innerHeight;
+
+      window.canvas2d.width = window.innerWidth;
+      window.canvas2d.height = window.innerHeight;
+
+      gl.viewport(0, 0, glCanvas.width, glCanvas.height);
       getPerspectiveMatrix(matrices.proj);
       bindMatrix(matrices.proj, programInfo.uniformLocations.projMatrix);
    };
@@ -40,10 +54,10 @@ function init() {
 
       window.onresize();
 
-      main(canvas, gl, programInfo, matrices, buffers);
+      main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers);
    });
 
-   BOARD.init();
+   BOARD.init(DATA.boardCode);
 }
 
 function error(error) {
@@ -159,7 +173,6 @@ function initCulling(gl) {
    gl.frontFace(gl.CCW);
 }
 
-const VISIBLE_HEIGHT = 1000;
 
 function getMatrices(gl, programInfo) {
    let i = new Float32Array(16);
@@ -195,7 +208,7 @@ function getPerspectiveMatrix(output) {
    mat4.perspective(
       output,
       fieldOfView * Math.PI / 180,
-      window.canvas.width / window.canvas.height,
+      window.glCanvas.width / window.glCanvas.height,
       0.1,
       cameraZ * -1 + 100
    );

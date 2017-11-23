@@ -8,21 +8,38 @@ const BOUNCE_FACTOR = 0.25;
 const GRAVITY = 1500;
 
 class Block {
-   constructor() {
-      let r = Math.floor(Math.random() * 4);
-      switch (r) {
-         case 0:
-            this.color = COLOR_RED;
-            break;
-         case 1:
-            this.color = COLOR_ORANGE;
-            break;
-         case 2:
-            this.color = COLOR_GREEN;
-            break;
-         case 3:
-            this.color = COLOR_BLUE;
-            break;
+   constructor(initColor) {
+      if (!initColor) {
+         let r = Math.floor(Math.random() * 4);
+         switch (r) {
+            case 0:
+               this.color = COLOR_RED;
+               break;
+            case 1:
+               this.color = COLOR_ORANGE;
+               break;
+            case 2:
+               this.color = COLOR_GREEN;
+               break;
+            case 3:
+               this.color = COLOR_BLUE;
+               break;
+         }
+      } else {
+         switch (initColor) {
+            case 'r':
+               this.color = COLOR_RED;
+               break;
+            case 'o':
+               this.color = COLOR_ORANGE;
+               break;
+            case 'g':
+               this.color = COLOR_GREEN;
+               break;
+            case 'b':
+               this.color = COLOR_BLUE;
+               break;
+         }
       }
       this._fill = 0; // 0 - 100
       this.x = 0;
@@ -47,13 +64,14 @@ class Block {
    blockLogic(delta, row, col) {
       this.row = row;
       this.col = col;
-      this.x = BOARD.getBoardX(this.col);
-      let maxY = BOARD.getBoardY(this.row);
+      this.x = BOARD.toGridX(this.col);
+      let maxY = BOARD.toGridY(this.row);
 
       if (this.row == -1 && !this.falling) {
          this.y = maxY + 10 *
             (Math.sin(performance.now() / 1000 + (this.col * -Math.PI / BOARD.COLUMNS)) - 1);
       } else {
+         this._fill = 100;
          while (delta > 0) {
             let spu = 1 / UPDATES_PER_SECOND;
             let timeSlice = delta < spu ? delta : spu;
@@ -88,7 +106,7 @@ class Block {
    }
 
    get gone() {
-      return this.y > VISIBLE_HEIGHT;
+      return this.y > VISIBLE_HEIGHT * 1.3;
    }
 
    renderBlock(gl, programInfo) {
