@@ -5,6 +5,16 @@
    <title>Blockery</title>
    <meta name="viewport" content="user-scalable=no" />
    <link rel="stylesheet" href="styles/main.css">
+
+   <!--   Favicon stuff   -->
+   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=1">
+   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=1">
+   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v=1">
+   <link rel="manifest" href="manifest.json?v=1">
+   <link rel="mask-icon" href="safari-pinned-tab.svg?v=1" color="#ff004c">
+   <meta name="apple-mobile-web-app-title" content="Blockery">
+   <meta name="application-name" content="Blockery">
+   <meta name="theme-color" content="#ffffff">
 </head>
 
 <body>
@@ -17,15 +27,21 @@
       <i id="debug_text"></i>
    </div>
    <i id="time"></i>
-   <script type="text/javascript" src="js/init.js"></script>
    <script type="text/javascript" src="js/gl-matrix.min.js"></script>
-   <script type="text/javascript" src="js/bignumber.min.js"></script>
+   <script type="text/javascript" src="js/ui.js"></script>
+   <script type="text/javascript" src="js/util.js"></script>
+   <script type="text/javascript" src="js/listeners.js"></script>
+   <script type="text/javascript" src="js/init.js"></script>
    <script type="text/javascript" src="js/main.js"></script>
+   <script type="text/javascript" src="js/game.js"></script>
    <script type="text/javascript" src="js/block.js"></script>
    <script type="text/javascript" src="js/board.js"></script>
-   <script type="text/javascript" src="js/data.js"></script>
+   <script type="text/javascript" src="js/button.js"></script>
    <script type="text/javascript" src="js/cube.js"></script>
-   <script type="text/javascript" src="js/util.js"></script>
+   <script type="text/javascript" src="js/data.js"></script>
+   <script type="text/javascript" src="js/dialogs.js"></script>
+   <script type="text/javascript" src="js/factories.js"></script>
+   <script type="text/javascript" src="js/noti.js"></script>
    <script type="text/javascript">
       init();
    </script>
