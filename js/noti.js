@@ -5,7 +5,7 @@ const NOTIFICATION_ANIMATE_DURATION = 0.5;
 let notiMessage = '';
 let notiDuration = 0;
 let notiElapsedTime = 0;
-const NOTIFICATION_HEIGHT = getStatusBarHeight() / 2;
+const NOTIFICATION_HEIGHT = getStatusBarHeight() * 3 / 4;
 const renderNotifications = (delta, ctx2d) => {
    if (notiElapsedTime > notiDuration) return;
    notiElapsedTime += delta;
@@ -19,16 +19,17 @@ const renderNotifications = (delta, ctx2d) => {
    let x = toBrowserX(getStatusBarX());
    let y = toBrowserY(-(NOTIFICATION_HEIGHT + UI_SHADOW) * (1 - (enter - exit)));
    let w = toBrowserW(getStatusBarWidth());
+   let h = toBrowserH(NOTIFICATION_HEIGHT);
 
    ctx2d.save();
 
    applyShadow(ctx2d);
    ctx2d.fillStyle = "rgba(255, 255, 255, " + UI_MAX_ALPHA + ")";
-   ctx2d.fillRect(x, y, w, NOTIFICATION_HEIGHT);
+   ctx2d.fillRect(x, y, w, h);
    removeShadow(ctx2d);
 
    ctx2d.beginPath();
-   ctx2d.rect(x, y, w, NOTIFICATION_HEIGHT);
+   ctx2d.rect(x, y, w, h);
    ctx2d.clip();
 
    // Render the message
@@ -36,7 +37,7 @@ const renderNotifications = (delta, ctx2d) => {
    ctx2d.font = getSansFont();
    ctx2d.textAlign = "center";
    ctx2d.textBaseline = "middle";
-   let textY = (NOTIFICATION_HEIGHT / 2) + (enter >= 1 ? y : y / 2);
+   let textY = (h / 2) + (enter >= 1 ? y : y / 2);
    ctx2d.fillText(notiMessage, x + w / 2, textY);
 
    ctx2d.restore();
