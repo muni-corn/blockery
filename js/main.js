@@ -1,8 +1,8 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global toBrowserX, toBrowserY, VISIBLE_HEIGHT, DATA, COLOR_BLUE, BOARD, isMobile, intToRGB, toGLX, toGLY, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
+/* global sendNotification, renderNotifications, dialogs, renderGame, renderDialogs, Button, renderScoreboard, renderStatusBar, toBrowserX, toBrowserY, VISIBLE_HEIGHT, Data, COLOR_BLUE, Board, isMobile, intToRGB, toGLX, toGLY, globalYOffset, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
 
 // The interval in which to save in seconds
-const SAVE_INTERVAL = 5
+const SAVE_INTERVAL = 60;
 
 function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
    let lastSave = 0;
@@ -12,12 +12,11 @@ function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
       if (!isNaN(now)) {
          let delta = (now - then) / 1000;
          then = now;
-
          logic(delta);
-         render(gl, matrices, programInfo, buffers, canvas2d, ctx2d);
+         render(delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d);
 
          if (now - lastSave >= SAVE_INTERVAL * 1000) {
-            DATA.save();
+            Data.save();
             lastSave = now;
          }
       }
@@ -28,74 +27,139 @@ function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
    requestAnimationFrame(loop);
 }
 
-let pitch, yaw, roll;
 let debug = document.getElementById("debug_text");
-let clicks = 0,
-   touchstarts = 0,
-   tsx, tsy, cx, cy, hasTouchStart, hasOnClick;
+let touched = false;
+let stx, sty; // Starting touch coordinates
+let etx, ety; // Ending touch coordinates
+const TOUCH_THRESHOLD = 10; // the start and end coordinates must be within this range to register as a touch
+let lastTouchY = 0;
+let saveOnBeforeUnload = true;
 
-window.onload = function () {
-   let listenerType = isMobile() ? "touchstart" : "click";
-   let x, y;
-   document.addEventListener(listenerType, function (event) {
-      if (listenerType === "touchstart") {
-         x = event.touches[0].clientX;
-         y = event.touches[0].clientY;
-      } else {
-         x = event.clientX;
-         y = event.clientY;
+window.onload = () => {
+   // Key listeners
+   document.addEventListener('keydown', function (event) {
+      if (event.ctrlKey && !event.repeat && event.key.toUpperCase() == "S") {
+         event.preventDefault();
+         Data.save();
+      }
+      if (event.ctrlKey && event.altKey && !event.repeat && event.key.toUpperCase() == "Q") {
+         event.preventDefault();
+         Board.queueFillingEnabled = !Board.queueFillingEnabled;
+         sendNotification(Board.queueFillingEnabled ? "Queue filling enabled" : "Queue filling disabled for anti-distraction purposes :)", 4);
+      }
+   });
+
+   document.addEventListener('touchmove', function (event) {
+      let delta = toGLY(event.touches[0].clientY - lastTouchY);
+      lastTouchY = event.touches[0].clientY;
+
+      etx = event.touches[0].clientX;
+      ety = event.touches[0].clientY - globalYOffset;
+
+      mouseListeners.forEach(listener => {
+         if (listener.onMouseMove)
+            listener.onMouseMove(toGLX(etx), toGLY(ety));
+      });
+
+   });
+   document.addEventListener('touchstart', function (event) {
+      stx = event.touches[0].clientX;
+      sty = event.touches[0].clientY - globalYOffset;
+   });
+   document.addEventListener('touchend', function (event) {
+      // If the ending coordinate is within range of the start coordinate,
+      // register as a touch
+      if (Math.sqrt(Math.pow(etx - stx, 2) + Math.pow(ety - sty, 2)) > TOUCH_THRESHOLD)
+         return;
+
+      onClickHandler(event);
+      touched = true;
+   });
+   document.addEventListener('mousedown', function (event) {
+      onClickHandler(event);
+   });
+   document.addEventListener('mousemove', function (event) {
+      // Convert to GL space
+      let x = toGLX(event.clientX);
+      let y = toGLY(event.clientY) - globalYOffset;
+
+      // If a dialog is showing, ignore input
+      if (dialogs.length > 0) {
+         dialogs[0].onMouseMove(x, y);
+         return;
       }
 
-      BOARD.onClick(x, y);
+      mouseListeners.forEach(listener => {
+         if (listener.onMouseMove)
+            listener.onMouseMove(x, y);
+      });
+   });
+
+   // Save data before the window closes
+   window.onbeforeunload = function () {
+      if (saveOnBeforeUnload)
+         Data.save();
+   };
+};
+
+// An array of objects that have functions called every time a mouse
+// event is fired.
+const mouseListeners = [];
+
+const onClickHandler = event => {
+   if (touched) {
+      touched = false;
+      return;
+   }
+
+   let x, y;
+   if (event.type.startsWith("touchstart")) {
+      x = event.touches[0].clientX;
+      y = event.touches[0].clientY;
+   } else if (event.type.startsWith("mouse")) {
+      x = event.clientX;
+      y = event.clientY;
+   }
+
+   // Convert to GL space
+   x = toGLX(x || etx);
+   y = toGLY(y || ety) - globalYOffset;
+
+   // Ignore input with a dialog showing
+   if (dialogs.length > 0) {
+      dialogs[0].onClick(x, y);
+      return;
+   }
+
+   mouseListeners.forEach(listener => {
+      if (listener.onClick)
+         listener.onClick(x, y);
    });
 };
 
 /************************************************
- * LOGIC
  * Computes game logic. The variable delta is
- * measured in seconds. Returns an object of data
- * to be passed to the rendering method.
+ * measured in seconds.
  ************************************************/
-const logic = (delta) => {
-   BOARD.logic(delta);
+const logic = delta => {
+   Board.logic(delta);
 };
 
-const render = (gl, matrices, programInfo, buffers, canvas2d, ctx2d) => {
+const render = (delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d) => {
    gl.clearColor(0.9, 0.9, 0.9, 1);
    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
    ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
 
-   BOARD.render(gl, programInfo);
-   renderScoreboard(gl, programInfo, ctx2d);
-};
+   renderGame(delta, gl, programInfo, matrices, ctx2d);
 
-const renderScoreboard = (gl, programInfo, ctx2d) => {
-   CUBE_MESH.setColor(COLOR_BLUE, gl, programInfo);
-   let x = BOARD.boardCenter.x - BOARD.width / 2 - BOARD.GRID_PADDING - BOARD.FRAME_THICKNESS;
-   let y = BOARD.boardCenter.y + BOARD.height / 2 + BOARD.GRID_PADDING + BOARD.FRAME_THICKNESS * 2;
-   let w = BOARD.width + BOARD.FRAME_THICKNESS * 2 + BOARD.GRID_PADDING * 2;
-   let h = VISIBLE_HEIGHT - y;
-   CUBE_MESH.render(gl, x, y, 0, w, h, BOARD.BLOCK_WIDTH);
+   // Render UI //
 
-   let amountText = DATA.currentBlocks;
+   // Reset the context's transformation to the identity matrix
+   ctx2d.setTransform(1, 0, 0, 1, 0, 0);
 
-   let textHeight = 50;
-   let monospaceFont = toBrowserY(72) + "px Digital-7";
-   let sansFont = toBrowserY(35) + "px New Cicle Fina";
+   // This should always come second to last
+   renderDialogs(delta, gl, programInfo, ctx2d);
 
-   ctx2d.font = monospaceFont;
-
-   let blocksTextX = toBrowserX(x + w - BOARD.FRAME_THICKNESS);
-   let textY = toBrowserY(y + h / 2) + toBrowserY(textHeight) / 2;
-
-
-   ctx2d.font = sansFont;
-   ctx2d.textAlign = "right";
-   ctx2d.fillStyle = "white";
-   ctx2d.fillText("blocks", blocksTextX, textY);
-
-   let blocksTextWidth = ctx2d.measureText(" blocks").width;
-
-   ctx2d.font = monospaceFont;
-   ctx2d.fillText(amountText, blocksTextX - blocksTextWidth, textY);
+   // This should always come last
+   renderNotifications(delta, ctx2d);
 };
