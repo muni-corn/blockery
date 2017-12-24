@@ -21,11 +21,11 @@ const intToARGB = (argb) => {
 
 const intToARGBText = (argb) => {
    let color = intToARGB(argb);
-   return `rgba(${color.r*255}, ${color.g*255}, ${color.b*255}, ${color.a})`;
+   return `rgba(${color.r * 255}, ${color.g * 255}, ${color.b * 255}, ${color.a})`;
 };
 const intToRGBText = (rgb) => {
    let color = intToRGB(rgb);
-   return `rgba(${color.r*255}, ${color.g*255}, ${color.b*255}, 1)`;
+   return `rgba(${color.r * 255}, ${color.g * 255}, ${color.b * 255}, 1)`;
 };
 
 const rgbToInt = (r, g, b) => {
