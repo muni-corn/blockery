@@ -1,26 +1,27 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global BOARD, DATA, mat4, glMatrix, main, CUBE_MESH */
+/* global loadTextResource, initGame, Board, Data, mat4, glMatrix, main, CUBE_MESH */
 
-window.glCanvas = document.getElementById("glCanvas");
-window.canvas2d = document.getElementById("canvas2d");
-window.gl = window.glCanvas.getContext("webgl");
+window.glCanvas = document.getElementById('glCanvas');
+window.canvas2d = document.getElementById('canvas2d');
+window.gl = window.glCanvas.getContext('webgl');
 window.ctx2d = window.canvas2d.getContext('2d');
 
-if (!window.ctx2d) alert("This browser does not support canvas drawing");
-if (!window.gl) window.gl = window.glCanvas.getContext("experimental-webgl");
-if (!window.gl) alert("This browser does not support WebGL.");
+if (!window.ctx2d) alert('This browser does not support canvas drawing');
+if (!window.gl) window.gl = window.glCanvas.getContext('experimental-webgl');
+if (!window.gl) alert('This browser does not support WebGL.');
 
 const VISIBLE_HEIGHT = 1000;
 const VISIBLE_WIDTH = VISIBLE_HEIGHT * 9 / 16;
 const UPDATES_PER_SECOND = 60;
 
 function init() {
-   DATA.load();
 
    let gl = window.gl;
    let glCanvas = window.glCanvas;
    let ctx2d = window.ctx2d;
    let canvas2d = window.canvas2d;
+
+   Data.load(ctx2d);
 
    let shaders;
    let buffers;
@@ -40,7 +41,7 @@ function init() {
    };
 
 
-   getShaders((result) => {
+   getShaders(result => {
       shaders = result;
       programInfo = getShaderProgramInfo(gl, shaders);
 
@@ -57,12 +58,14 @@ function init() {
       main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers);
    });
 
-   BOARD.init(DATA.boardCode);
+   // Initialize everything else
+   Board.init(ctx2d, Data.boardCode);
+   initGame();
 }
 
 function error(error) {
-   let textBox = document.getElementById("error_text");
-   textBox.innerHTML = textBox.innerHTML + error + "<br/><br/>";
+   let errorBox = document.getElementById('error_text');
+   errorBox.innerHTML = errorBox.innerHTML + error + '<br/><br/>';
 }
 
 function getBuffers(gl) {
@@ -74,11 +77,11 @@ function getBuffers(gl) {
 }
 
 function getShaders(callback) {
-   loadTextResource("shaders/vertex.glsl", function (vsError, vsResult) {
+   loadTextResource('shaders/vertex.glsl', function (vsError, vsResult) {
       if (vsError)
          error(vsError);
       else
-         loadTextResource("shaders/fragment.glsl", function (fsError, fsResult) {
+         loadTextResource('shaders/fragment.glsl', function (fsError, fsResult) {
             if (fsError)
                error(fsError);
             else {
@@ -89,24 +92,6 @@ function getShaders(callback) {
             }
          });
    });
-}
-
-/************************************************
- * LOAD TEXT RESOURCE
- * Passes an error or, if no error, null and a 
- * result into callback.
- ************************************************/
-function loadTextResource(url, callback) {
-   let request = new XMLHttpRequest();
-   request.open("GET", url, true);
-   request.onload = function () {
-      if (request.status < 200 || request.status > 299) {
-         callback("Error: HTTP Status " + request.status + " on resource " + url);
-      } else {
-         callback(null, request.responseText);
-      }
-   };
-   request.send();
 }
 
 /************************************************
@@ -136,13 +121,13 @@ function getShaderProgramInfo(gl, shaders) {
    if (!gl.getProgramParameter(prog, gl.VALIDATE_STATUS))
       error(gl.getProgramInfoLog(prog));
 
-   let vertexPosAttrib = gl.getAttribLocation(prog, "vertPos");
-   let vertexNormalAttrib = gl.getAttribLocation(prog, "vertNormal");
+   let vertexPosAttrib = gl.getAttribLocation(prog, 'vertPos');
+   let vertexNormalAttrib = gl.getAttribLocation(prog, 'vertNormal');
 
-   let wmLocation = gl.getUniformLocation(prog, "mWorld");
-   let vmLocation = gl.getUniformLocation(prog, "mView");
-   let pmLocation = gl.getUniformLocation(prog, "mProj");
-   let colorLocation = gl.getUniformLocation(prog, "color");
+   let wmLocation = gl.getUniformLocation(prog, 'mWorld');
+   let vmLocation = gl.getUniformLocation(prog, 'mView');
+   let pmLocation = gl.getUniformLocation(prog, 'mProj');
+   let colorLocation = gl.getUniformLocation(prog, 'color');
 
    return {
       program: prog,
@@ -173,6 +158,11 @@ function initCulling(gl) {
    gl.frontFace(gl.CCW);
 }
 
+function setCameraOffset(x, y, cameraMatrix, matrixUniformLocation) {
+   mat4.lookAt(cameraMatrix, [VISIBLE_WIDTH / 2 - x, VISIBLE_HEIGHT / 2 - y, -CAMERA_Z], [VISIBLE_WIDTH / 2 - x, VISIBLE_HEIGHT / 2 - y, 0], [0, -1, 0]); // out, eye, center, upAxis
+   bindMatrix(cameraMatrix, matrixUniformLocation);
+}
+
 
 function getMatrices(gl, programInfo) {
    let i = new Float32Array(16);
@@ -181,8 +171,8 @@ function getMatrices(gl, programInfo) {
    let p = new Float32Array(16);
 
    mat4.identity(i);
-   mat4.identity(w);
-   mat4.lookAt(v, [VISIBLE_HEIGHT / 2, VISIBLE_HEIGHT / 2, -cameraZ], [VISIBLE_HEIGHT / 2, VISIBLE_HEIGHT / 2, 0], [0, -1, 0]); // out, eye, center, upAxis
+   mat4.lookAt(w, [VISIBLE_WIDTH / 2, VISIBLE_HEIGHT / 2, -CAMERA_Z], [VISIBLE_WIDTH / 2, VISIBLE_HEIGHT / 2, 0], [0, -1, 0]); // out, eye, center, upAxis
+   mat4.identity(v);
    getPerspectiveMatrix(p);
 
    bindMatrix(w, programInfo.uniformLocations.worldMatrix);
@@ -202,7 +192,7 @@ function bindMatrix(matrix, uniformLocation) {
 }
 
 const fieldOfView = 45;
-let cameraZ = VISIBLE_HEIGHT / 2 / Math.tan(fieldOfView * Math.PI / 180 / 2);
+const CAMERA_Z = VISIBLE_HEIGHT / 2 / Math.tan(fieldOfView * Math.PI / 180 / 2);
 
 function getPerspectiveMatrix(output) {
    mat4.perspective(
@@ -210,14 +200,14 @@ function getPerspectiveMatrix(output) {
       fieldOfView * Math.PI / 180,
       window.glCanvas.width / window.glCanvas.height,
       0.1,
-      cameraZ * -1 + 100
+      CAMERA_Z * -1 + 100
    );
 }
 
 function initLighting(gl, programInfo) {
-   let ambientLightIntensityLocation = gl.getUniformLocation(programInfo.program, "ambientLightIntensity");
-   let sunIntensityLocation = gl.getUniformLocation(programInfo.program, "sun.color");
-   let sunPositionLocation = gl.getUniformLocation(programInfo.program, "sun.position");
+   let ambientLightIntensityLocation = gl.getUniformLocation(programInfo.program, 'ambientLightIntensity');
+   let sunIntensityLocation = gl.getUniformLocation(programInfo.program, 'sun.color');
+   let sunPositionLocation = gl.getUniformLocation(programInfo.program, 'sun.position');
 
    gl.uniform3f(ambientLightIntensityLocation, 0.85, 0.85, 0.85);
    gl.uniform3f(sunIntensityLocation, 0.15, 0.15, 0.15);

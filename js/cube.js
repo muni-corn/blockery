@@ -101,9 +101,8 @@ const CUBE_MESH = {
       gl.uniform3f(programInfo.uniformLocations.color, color.r, color.g, color.b);
    },
    init: function (gl, matrices, programInfo) {
-      this.worldMatrix = matrices.world;
-      this.identityMatrix = matrices.identity;
-      this.matrixUniformLocation = programInfo.uniformLocations.worldMatrix;
+      this.matrices = matrices;
+      this.matrixUniformLocation = programInfo.uniformLocations.viewMatrix;
       this.buffers = {
          vertex: gl.createBuffer(),
          normal: gl.createBuffer(),
@@ -125,27 +124,27 @@ const CUBE_MESH = {
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
    },
    render: function (gl, x, y, z = 0, w = 50, h = 50, d = 50, pit = 0, yaw = 0, rol = 0) {
-      mat4.translate(this.worldMatrix, this.identityMatrix, [x + w / 2, y + h / 2, z + d / 2]);
+      mat4.translate(this.matrices.view, this.matrices.identity, [x + w / 2, y + h / 2, z + d / 2]);
 
       if (w !== 2 || h !== 2 || d !== 2)
-         mat4.scale(this.worldMatrix, this.worldMatrix, [w / 2, h / 2, d / 2]);
+         mat4.scale(this.matrices.view, this.matrices.view, [w / 2, h / 2, d / 2]);
 
       if (rol !== 0) {
-         mat4.rotate(rollMatrix, this.identityMatrix, rol * toRad, [0, 0, 1]);
-         mat4.mul(this.worldMatrix, this.worldMatrix, rollMatrix);
+         mat4.rotate(rollMatrix, this.matrices.identity, rol * toRad, [0, 0, 1]);
+         mat4.mul(this.matrices.view, this.matrices.view, rollMatrix);
       }
 
       if (yaw !== 0) {
-         mat4.rotate(yawMatrix, this.identityMatrix, yaw * toRad, [0, 1, 0]);
-         mat4.mul(this.worldMatrix, this.worldMatrix, yawMatrix);
+         mat4.rotate(yawMatrix, this.matrices.identity, yaw * toRad, [0, 1, 0]);
+         mat4.mul(this.matrices.view, this.matrices.view, yawMatrix);
       }
 
       if (pit !== 0) {
-         mat4.rotate(pitchMatrix, this.identityMatrix, pit * toRad, [1, 0, 0]);
-         mat4.mul(this.worldMatrix, this.worldMatrix, pitchMatrix);
+         mat4.rotate(pitchMatrix, this.matrices.identity, pit * toRad, [1, 0, 0]);
+         mat4.mul(this.matrices.view, this.matrices.view, pitchMatrix);
       }
 
-      bindMatrix(this.worldMatrix, this.matrixUniformLocation);
+      bindMatrix(this.matrices.view, this.matrixUniformLocation);
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
       gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
