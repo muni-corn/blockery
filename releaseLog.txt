@@ -1,0 +1,1 @@
+Factories!! Open the menu up top to purchase factories that will make blocks for you. Factories can only store so many blocks and must be emptied once in a while. Each factory you purchase will empty at 100 blocks per second. Also in this update are dialogs (like this one :)), board lights that blink, notifications, and browser icons. More to come! Thanks for playing Blockery. :)

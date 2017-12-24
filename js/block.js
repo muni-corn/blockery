@@ -1,17 +1,19 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* globals UPDATES_PER_SECOND, CUBE_MESH, VISIBLE_HEIGHT, BOARD, toScreenX, toScreenY, getBoardX, getBoardY */
+/* globals UPDATES_PER_SECOND, CUBE_MESH, VISIBLE_HEIGHT, Board, toScreenX, toScreenY, getBoardX, getBoardY */
 const COLOR_RED = 0xff004c;
 const COLOR_ORANGE = 0xffa530;
 const COLOR_GREEN = 0x50ec8c;
 const COLOR_BLUE = 0x117cff;
+const COLOR_POISON = 0x000000;
 const BOUNCE_FACTOR = 0.25;
 const GRAVITY = 1500;
 
 class Block {
    constructor(initColor) {
       if (!initColor) {
-         let r = Math.floor(Math.random() * 4);
-         switch (r) {
+         let r = Math.random();
+         let c = Math.floor(r * 4);
+         switch (c) {
             case 0:
                this.color = COLOR_RED;
                break;
@@ -61,35 +63,42 @@ class Block {
       this.yv = -500 * Math.random();
    }
 
+   get destY() {
+      return Board.toGridY(this.row) + (this.row >= 0 && this.color == COLOR_POISON ? Board.SPACING : 0);
+   }
+
    blockLogic(delta, row, col) {
       this.row = row;
       this.col = col;
-      this.x = BOARD.toGridX(this.col);
-      let maxY = BOARD.toGridY(this.row);
+      this.x = Board.toGridX(this.col);
 
       if (this.row == -1 && !this.falling) {
-         this.y = maxY + 10 *
-            (Math.sin(performance.now() / 1000 + (this.col * -Math.PI / BOARD.COLUMNS)) - 1);
+         this.y = this.destY + 10 *
+            (Math.sin(performance.now() / 1000 + (this.col * -Math.PI / Board.COLUMNS)) - 1);
       } else {
          this._fill = 100;
-         while (delta > 0) {
-            let spu = 1 / UPDATES_PER_SECOND;
-            let timeSlice = delta < spu ? delta : spu;
+         if (delta > 2) {
+            this.y = this.destY;
+            this.yv = 0;
+         } else
+            while (delta > 0) {
+               let spu = 1 / UPDATES_PER_SECOND; // Seconds per update
+               let timeSlice = delta < spu ? delta : spu;
 
-            this.yv += GRAVITY * timeSlice;
-            this.y += this.yv * timeSlice;
+               this.yv += GRAVITY * timeSlice;
+               this.y += this.yv * timeSlice;
 
-            if (!this.falling && this.y >= maxY) {
-               this.yv *= -BOUNCE_FACTOR;
-               this.y = maxY;
-            } else if (this.falling) {
-               this.pit += this.pitV * timeSlice;
-               this.yaw += this.yawV * timeSlice;
-               this.rol += this.rolV * timeSlice;
-               this.z += this.zv * timeSlice;
+               if (!this.falling && this.y >= this.destY) {
+                  this.yv *= -BOUNCE_FACTOR;
+                  this.y = this.destY;
+               } else if (this.falling) {
+                  this.pit += this.pitV * timeSlice;
+                  this.yaw += this.yawV * timeSlice;
+                  this.rol += this.rolV * timeSlice;
+                  this.z += this.zv * timeSlice;
+               }
+               delta -= timeSlice;
             }
-            delta -= timeSlice;
-         }
       }
    }
 
@@ -114,8 +123,8 @@ class Block {
       // Re-assign the fill variable for a cool cubic-easing animation effect ;)
       f--;
       f = (f * f * f + 1);
-      let bw = BOARD.BLOCK_WIDTH;
-      let w = BOARD.BLOCK_WIDTH * ((f * 5 > 1) ? 1 : (f * 5));
+      let bw = Board.BLOCK_WIDTH;
+      let w = Board.BLOCK_WIDTH * ((f * 5 > 1) ? 1 : (f * 5));
       let h = bw * f;
 
       CUBE_MESH.setColor(this.color, gl, programInfo);

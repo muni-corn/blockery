@@ -1,9 +1,16 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global toGLX, toGLY, COLOR_RED, COLOR_ORANGE, COLOR_GREEN, COLOR_BLUE, toScreenX, toScreenY, Block, VISIBLE_HEIGHT, DATA, CUBE_MESH */
+/* global BigNumber, invokeBlockCountListeners, Dialog, COLOR_POISON, mouseListeners, intToRGB, rgbToInt, toGLX, toGLY, COLOR_RED, COLOR_ORANGE, COLOR_GREEN, COLOR_BLUE, toScreenX, toScreenY, Block, VISIBLE_WIDTH, VISIBLE_HEIGHT, Data, CUBE_MESH */
 
-// Board grid standard is 14 rows by 10 columns
+let blinkTime = 0;
+let blinkEnd = 0;
+let blinkR = 0;
+let blinkG = 0;
+let blinkB = 0;
+let defaultGray = 0.95;
+let lightColor;
 
-const BOARD = {
+const Board = {
+   // Board grid standard is 14 rows by 10 columns
    get ROWS() {
       return 14;
    },
@@ -24,9 +31,11 @@ const BOARD = {
    },
 
    boardCenter: {
-      x: VISIBLE_HEIGHT / 2,
+      x: VISIBLE_WIDTH / 2,
       y: VISIBLE_HEIGHT / 2
    },
+
+   queueFillingEnabled: true,
    fillRate: 2 * 100, // The rate at which cubes fill in units per second
    pendingFillTime: 0,
    dropQueue: function () {
@@ -40,6 +49,9 @@ const BOARD = {
       if (boardFull) this.pendingFillTime = 0;
    },
    fillQueue: function (delta) {
+      if (!this.queueFillingEnabled)
+         return;
+
       this.pendingFillTime += delta;
       let shouldDrop = true;
       for (let i = 0; i < this.COLUMNS; i++) {
@@ -87,11 +99,13 @@ const BOARD = {
    },
    dumpBlocks: [],
 
-   init: function (boardCode) {
+   init: function (ctx2d, boardCode) {
+      this.ctx2d = ctx2d;
       for (let r = 0; r < this.ROWS; r++) {
          this.board[r] = [];
          for (let c = 0; c < this.COLUMNS; c++) {
             let codeIndex = r * this.COLUMNS + c;
+            let color;
             if (boardCode && (color = boardCode[codeIndex]) !== '0') {
                this.board[r][c] = new Block(color);
                continue;
@@ -102,20 +116,39 @@ const BOARD = {
 
       for (let i = 0; i < this.COLUMNS; i++)
          this.queue[i] = null;
+
+      mouseListeners.push(this);
    },
 
    logic: function (delta) {
+
+      let isBlinkColor = blinkR !== 0 || blinkG !== 0 || blinkB !== 0;
+      if (isBlinkColor && (blinkTime < blinkEnd || blinkEnd === 0))
+         blinkTime += delta * 10;
+      else blinkTime = blinkEnd;
+
+      let foo = Math.abs(Math.sin(blinkTime)) * 3 / 4;
+      let r = foo * blinkR + (1 - foo) * defaultGray;
+      let g = foo * blinkG + (1 - foo) * defaultGray;
+      let b = foo * blinkB + (1 - foo) * defaultGray;
+      lightColor = rgbToInt(r, g, b);
 
       // Do board logic
       // Start from the bottom row and move up
       for (let r = this.ROWS - 1; r >= 0; r--) {
          for (let c = 0; c < this.COLUMNS; c++) {
             let block = this.board[r][c];
-            if (block !== null)
+            if (block !== null) {
                // If a block here exists, calculate physics on
                // this block
                block.blockLogic(delta, r, c);
-            else if (r > 0) {
+
+               // If a poison block reaches the bottom, remove it
+               // (and inflict punishment >:))
+               if (r === this.ROWS - 1 && block.color === COLOR_POISON) {
+                  this.pushBlockToDump(r, c);
+               }
+            } else if (r > 0) {
                // If this slot doesn't have a block and this
                // isn't the first row, then move the block
                // above this slot to this slot
@@ -142,6 +175,12 @@ const BOARD = {
       // Do trash block logic
       this.dumpBlocks.forEach((item, index, array) => {
          item.blockLogic(delta, item.row, item.col);
+         if (item.y >= item.destY && !item.falling) {
+            // (For poison blocks)
+            // Make the block fall if it is at or past it's
+            // destination y position
+            item.fall();
+         }
          if (item.gone)
             this.countBlock(this.dumpBlocks.splice(index, 1)[0]);
       });
@@ -178,53 +217,73 @@ const BOARD = {
       });
    },
    renderBoardFrame: function (gl, programInfo) {
+      // Declare a shorter name for frame thickness
+      let t = this.FRAME_THICKNESS;
+
       CUBE_MESH.setColor(0xffffff, gl, programInfo);
 
       // Left side of frame
-      let lw = this.FRAME_THICKNESS;
-      let lh = BOARD.height + this.GRID_PADDING;
-      let lx = this.boardCenter.x - this.width / 2 - this.GRID_PADDING - this.FRAME_THICKNESS;
+      let lw = t;
+      let lh = Board.height + this.GRID_PADDING;
+      let lx = this.boardCenter.x - this.width / 2 - this.GRID_PADDING - t;
       let ly = this.boardCenter.y - this.height / 2;
-      CUBE_MESH.render(gl, lx, ly, 0, lw, lh, this.FRAME_THICKNESS);
+      CUBE_MESH.render(gl, lx, ly, 0, lw, lh, t);
 
       // Right side of frame
       let rw = lw;
       let rh = lh;
       let rx = this.boardCenter.x + this.width / 2 + this.GRID_PADDING;
       let ry = ly;
-      CUBE_MESH.render(gl, rx, ry, 0, rw, rh, this.FRAME_THICKNESS);
+      CUBE_MESH.render(gl, rx, ry, 0, rw, rh, t);
 
       //  Bottom of the frame
-      let bh = this.FRAME_THICKNESS;
-      let bw = BOARD.width + this.FRAME_THICKNESS * 2 + this.GRID_PADDING * 2;
+      let bh = t;
+      let bw = Board.width + t * 2 + this.GRID_PADDING * 2;
       let bx = lx;
       let by = this.boardCenter.y + this.height / 2 + this.GRID_PADDING;
-      CUBE_MESH.render(gl, bx, by, 0, bw, bh, this.FRAME_THICKNESS);
+      CUBE_MESH.render(gl, bx, by, 0, bw, bh, t);
+
+      // Lights
+      CUBE_MESH.setColor(lightColor, gl, programInfo);
+      CUBE_MESH.render(gl, lx, ly - t, 0, t, t, t);
+      CUBE_MESH.render(gl, rx, ry - t, 0, t, t, t);
+   },
+   blinkLights(color, count = 2) {
+      color = intToRGB(color);
+
+      blinkR = color.r;
+      blinkG = color.g;
+      blinkB = color.b;
+
+      blinkEnd = Math.PI * count;
+      blinkTime = 0;
    },
 
    /************************************************
-    * REMOVE BLOCK FROM GRID
     * Transfers the block at the given row and
     * column to the array of falling (dump) blocks.
     ************************************************/
-   removeBlockFromGrid: function (row, col) {
+   pushBlockToDump: function (row, col) {
       this.dumpBlocks.push(this.board[row][col]);
       this.board[row][col] = null;
    },
    countBlock: function (block) {
-      DATA.currentBlocks = DATA.currentBlocks.plus(1);
+      if (block.color === COLOR_POISON)
+         return;
+
+      Data.currentBlocks++;
       switch (block.color) {
          case COLOR_RED:
-            DATA.lifetimeBlocks.red = DATA.lifetimeBlocks.red.plus(1);
+            Data.lifetimeBlocks.red++;
             break;
          case COLOR_ORANGE:
-            DATA.lifetimeBlocks.orange = DATA.lifetimeBlocks.orange.plus(1);
+            Data.lifetimeBlocks.orange++;
             break;
          case COLOR_GREEN:
-            DATA.lifetimeBlocks.green = DATA.lifetimeBlocks.green.plus(1);
+            Data.lifetimeBlocks.green++;
             break;
          case COLOR_BLUE:
-            DATA.lifetimeBlocks.blue = DATA.lifetimeBlocks.blue.plus(1);
+            Data.lifetimeBlocks.blue++;
             break;
       }
    },
@@ -274,7 +333,7 @@ const BOARD = {
          hadMatch = true;
 
       if (hadMatch) {
-         this.removeBlockFromGrid(row, col);
+         this.pushBlockToDump(row, col);
          return true;
       }
       return false;
@@ -304,18 +363,16 @@ const BOARD = {
       }
       return false;
    },
-   onClick: function (eventX, eventY) {
-      let mx = toGLX(eventX);
-      let my = toGLY(eventY);
+   onClick: function (mx, my) {
       let slotSize = this.BLOCK_WIDTH + this.SPACING;
       let row = Math.floor((my - this.boardCenter.y + (this.height / 2) - this.SPACING) / slotSize - 1);
       let col = Math.floor((mx - this.boardCenter.x + (this.width / 2)) / slotSize);
 
       if (row >= 0 && row < this.ROWS && col >= 0 && col < this.COLUMNS)
          if (this.removeIfMatchingNeighbors(row, col)) {
-            DATA.lifetimeClicks.successful++;
+            Data.lifetimeClicks.successful++;
          } else {
-            DATA.lifetimeClicks.failed++;
+            Data.lifetimeClicks.failed++;
          }
    }
 };
