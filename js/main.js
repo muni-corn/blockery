@@ -49,25 +49,11 @@ window.onload = () => {
       }
    });
 
-   document.addEventListener('touchmove', function (event) {
-      let delta = toGLY(event.touches[0].clientY - lastTouchY);
-      lastTouchY = event.touches[0].clientY;
 
-      etx = event.touches[0].clientX;
-      ety = event.touches[0].clientY - globalYOffset;
+   let listenerType = isMobile() ? "touchstart" : "mousedown";
 
-      mouseListeners.forEach(listener => {
-         if (listener.onMouseMove)
-            listener.onMouseMove(toGLX(etx), toGLY(ety));
-      });
-
-   });
-   document.addEventListener('touchstart', function (event) {
-      stx = event.touches[0].clientX;
-      sty = event.touches[0].clientY - globalYOffset;
-
+   document.addEventListener(listenerType, function (event) {
       onClickHandler(event);
-      touched = true;
    });
    // Doesn't work with iPhones >:( >:( >:(
    // document.addEventListener('touchend', function (event) {
@@ -79,9 +65,8 @@ window.onload = () => {
    //    onClickHandler(event);
    //    touched = true;
    // });
-   document.addEventListener('mousedown', function (event) {
-      onClickHandler(event);
-   });
+
+   // mouse move
    document.addEventListener('mousemove', function (event) {
       // Convert to GL space
       let x = toGLX(event.clientX);
@@ -99,6 +84,19 @@ window.onload = () => {
       });
    });
 
+   document.addEventListener('touchmove', function (event) {
+      let delta = toGLY(event.touches[0].clientY - lastTouchY);
+      lastTouchY = event.touches[0].clientY;
+
+      etx = event.touches[0].clientX;
+      ety = event.touches[0].clientY - globalYOffset;
+
+      mouseListeners.forEach(listener => {
+         if (listener.onMouseMove)
+            listener.onMouseMove(toGLX(etx), toGLY(ety));
+      });
+   });
+
    // Save data before the window closes
    window.onbeforeunload = function () {
       if (saveOnBeforeUnload)
@@ -111,10 +109,10 @@ window.onload = () => {
 const mouseListeners = [];
 
 const onClickHandler = event => {
-   if (touched) {
-      touched = false;
-      return;
-   }
+   // if (touched) {
+   //    touched = false;
+   //    return;
+   // }
 
    let x, y;
    if (event.type.startsWith("touchstart")) {
