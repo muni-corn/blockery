@@ -65,16 +65,20 @@ window.onload = () => {
    document.addEventListener('touchstart', function (event) {
       stx = event.touches[0].clientX;
       sty = event.touches[0].clientY - globalYOffset;
-   });
-   document.addEventListener('touchend', function (event) {
-      // If the ending coordinate is within range of the start coordinate,
-      // register as a touch
-      if (Math.sqrt(Math.pow(etx - stx, 2) + Math.pow(ety - sty, 2)) > TOUCH_THRESHOLD)
-         return;
 
       onClickHandler(event);
       touched = true;
    });
+   // Doesn't work with iPhones >:( >:( >:(
+   // document.addEventListener('touchend', function (event) {
+   //    // If the ending coordinate is within range of the start coordinate,
+   //    // register as a touch
+   //    if (Math.sqrt(Math.pow(etx - stx, 2) + Math.pow(ety - sty, 2)) > TOUCH_THRESHOLD)
+   //       return;
+
+   //    onClickHandler(event);
+   //    touched = true;
+   // });
    document.addEventListener('mousedown', function (event) {
       onClickHandler(event);
    });
