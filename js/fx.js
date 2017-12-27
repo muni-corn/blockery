@@ -1,0 +1,1 @@
+/* jshint esversion: 6, devel: true, browser: true */
