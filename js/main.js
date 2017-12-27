@@ -159,6 +159,9 @@ const render = (delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d) => {
    // Reset the context's transformation to the identity matrix
    ctx2d.setTransform(1, 0, 0, 1, 0, 0);
 
+   // Render special effects that are cool
+   renderSpecialEffects(delta, ctx2d);
+
    // This should always come second to last
    renderDialogs(delta, gl, programInfo, ctx2d);
 
