@@ -116,6 +116,7 @@ class Factory {
       if (this.isAffordable(Data.currentBlocks)) {
          Data.currentBlocks -= this.price;
          this.amountOwned++;
+         new Firework(this.imageButton.x + this.imageButton.w / 2, this.imageButton.y + this.imageButton.h / 2);
       }
    }
 
