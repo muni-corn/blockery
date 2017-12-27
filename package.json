@@ -5,9 +5,5 @@
   "scripts": {
     "dev": "lite-server"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/harrisonthorne/blockery.git"
-  },
   "author": "Harrison Thorne"
 }
