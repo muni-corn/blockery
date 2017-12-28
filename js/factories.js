@@ -1,5 +1,8 @@
 /* jshint esversion: 6 */
 
+const COLOR_DISABLED_PURCHASE = 0x002caf;
+const COLOR_DARK_GREEN = 0x009c3c;
+
 let globalBlockRateMultiplier = 1,
    globalPollutionMultiplier = 1,
    globalCapacityMultiplier = 1,
@@ -23,6 +26,7 @@ class Factory {
       this.index = index;
       this.page = index / FACTORIES_PER_PAGE;
       this.name = name;
+      this.imgSrc = imgSrc;
       this.basePrice = basePrice;
       this.baseProductionRate = blockRate;
       this.basePollutionRate = pollutionRate;
@@ -40,14 +44,17 @@ class Factory {
       this.totalPollutionProduced = 0;
       this.totalBlocksProduced = 0;
 
-      this.progressButton = new ProgressButton(getStatusBarX(), 0, getStatusBarWidth(), STORAGE_BUTTON_HEIGHT, COLOR_GREEN, COLOR_BLUE, '', () => {
+      this.progressButton = new ProgressButton(getStatusBarX(), 0, getStatusBarWidth(), STORAGE_BUTTON_HEIGHT, COLOR_GREEN, COLOR_DARK_GREEN, '', () => {
          this.empty();
       }); //TODO
       this.progressButton.typeface = 'Digital-7';
 
-      this.imageButton = new ImageButton(getStatusBarX(), 0, PURCHASE_BUTTON_SIZE, PURCHASE_BUTTON_SIZE, COLOR_BLUE, imgSrc, () => {
+      this.imageButton = new ImageButton(getStatusBarX(), 0, PURCHASE_BUTTON_SIZE, PURCHASE_BUTTON_SIZE, COLOR_BLUE, "img/unknown.png", () => {
          this.buy();
       });
+      this.imageButton.disabledColor = COLOR_DISABLED_PURCHASE;
+
+      this.wasHidden = true;
    }
 
    logic(delta) {
@@ -161,6 +168,10 @@ class Factory {
       }
 
       let hidden = factoriesUnlocked === this.index;
+      if (!hidden && this.wasHidden) {
+         this.imageButton.imgSrc = this.imgSrc;
+         this.wasHidden = hidden;
+      }
 
       // Assign an easier variable for UI_PADDING
       let p = UI_PADDING;
