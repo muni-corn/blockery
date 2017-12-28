@@ -1,4 +1,5 @@
 /* jshint esversion: 6 */
+/* global VISIBLE_HEIGHT, mouseListeners, Data, Listeners, UI_PADDING, ProgressButton, ImageButton, Board, COLOR_RED, COLOR_ORANGE, COLOR_GREEN, COLOR_BLUE, COLOR_POISON, getStatusBarX,getStatusBarWidth, UI_SANS_TEXT_HEIGHT, getStatusBarHeight, Button, goBackToBoard, CUBE_MESH, toBrowserX, toBrowserY, DIALOG_TITLE_TEXT_HEIGHT, toBrowserH, getSansFont*/
 
 const COLOR_DISABLED_PURCHASE = 0x002caf;
 const COLOR_DARK_GREEN = 0x009c3c;
