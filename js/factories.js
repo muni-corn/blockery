@@ -1,5 +1,7 @@
 /* jshint esversion: 6 */
-/* global VISIBLE_HEIGHT, mouseListeners, Data, Listeners, UI_PADDING, ProgressButton, ImageButton, Board, COLOR_RED, COLOR_ORANGE, COLOR_GREEN, COLOR_BLUE, COLOR_POISON, getStatusBarX,getStatusBarWidth, UI_SANS_TEXT_HEIGHT, getStatusBarHeight, Button, goBackToBoard, CUBE_MESH, toBrowserX, toBrowserY, DIALOG_TITLE_TEXT_HEIGHT, toBrowserH, getSansFont*/
+
+const COLOR_DISABLED_PURCHASE = 0x002caf;
+const COLOR_DARK_GREEN = 0x009c3c;
 
 let globalBlockRateMultiplier = 1,
    globalPollutionMultiplier = 1,
@@ -19,10 +21,12 @@ let currentFactoryPage = 0;
 let factoriesMenuYOffset = 0;
 
 class Factory {
-   constructor(index, name, imgSrc, basePrice, blockRate, pollutionRate, capacity) {
+   constructor(factoryCode, index, name, imgSrc, basePrice, blockRate, pollutionRate, capacity) {
+      this.factoryCode = factoryCode;
       this.index = index;
       this.page = index / FACTORIES_PER_PAGE;
       this.name = name;
+      this.imgSrc = imgSrc;
       this.basePrice = basePrice;
       this.baseProductionRate = blockRate;
       this.basePollutionRate = pollutionRate;
@@ -40,14 +44,17 @@ class Factory {
       this.totalPollutionProduced = 0;
       this.totalBlocksProduced = 0;
 
-      this.progressButton = new ProgressButton(getStatusBarX(), 0, getStatusBarWidth(), STORAGE_BUTTON_HEIGHT, COLOR_GREEN, COLOR_BLUE, '', () => {
+      this.progressButton = new ProgressButton(getStatusBarX(), 0, getStatusBarWidth(), STORAGE_BUTTON_HEIGHT, COLOR_GREEN, COLOR_DARK_GREEN, '', () => {
          this.empty();
       }); //TODO
       this.progressButton.typeface = 'Digital-7';
 
-      this.imageButton = new ImageButton(getStatusBarX(), 0, PURCHASE_BUTTON_SIZE, PURCHASE_BUTTON_SIZE, COLOR_BLUE, imgSrc, () => {
+      this.imageButton = new ImageButton(getStatusBarX(), 0, PURCHASE_BUTTON_SIZE, PURCHASE_BUTTON_SIZE, COLOR_BLUE, "img/unknown.png", () => {
          this.buy();
       });
+      this.imageButton.disabledColor = COLOR_DISABLED_PURCHASE;
+
+      this.wasHidden = true;
    }
 
    logic(delta) {
@@ -161,6 +168,10 @@ class Factory {
       }
 
       let hidden = factoriesUnlocked === this.index;
+      if (!hidden && this.wasHidden) {
+         this.imageButton.imgSrc = this.imgSrc;
+         this.wasHidden = hidden;
+      }
 
       // Assign an easier variable for UI_PADDING
       let p = UI_PADDING;
@@ -254,16 +265,16 @@ class Factory {
 
 // Excuse this mess
 let factories = {
-   smit: new Factory(0, 'Blocksmith', 'img/smit.png', 500, 0.5, 0.1, 50),
-   cott: new Factory(1, 'Cottage Factory', 'img/cott.png', 500 * 15, 0.5 * 4, 0.1 * 5, 50 * 6),
-   mine: new Factory(2, 'Block Mine', 'img/mine.png', 500 * 15 * 15, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12),
-   powh: new Factory(3, 'Powerhouse', 'img/powh.png', 500 * 15 * 15 * 15, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18),
-   clmk: new Factory(4, 'Cloudmaker', 'img/clmk.png', 500 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24),
-   volc: new Factory(5, 'Block Volcano', 'img/volc.png', 500 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30),
-   mnfm: new Factory(6, 'Moon Block Farm', 'img/mnfm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36),
-   plsm: new Factory(7, 'Planetary Block Storm', 'img/plsm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42),
-   star: new Factory(8, 'Star Reactor', 'img/star.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48),
-   dmgt: new Factory(9, 'Interdimensional Gateway', 'img/dmgt.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54)
+   smit: new Factory("smit", 0, 'Blocksmith', 'img/smit.png', 500, 0.5, 0.1, 50),
+   cott: new Factory("cott", 1, 'Cottage Factory', 'img/cott.png', 500 * 15, 0.5 * 4, 0.1 * 5, 50 * 6),
+   mine: new Factory("mine", 2, 'Block Mine', 'img/mine.png', 500 * 15 * 15, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12),
+   powh: new Factory("powh", 3, 'Powerhouse', 'img/powh.png', 500 * 15 * 15 * 15, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18),
+   clmk: new Factory("clmk", 4, 'Cloudmaker', 'img/clmk.png', 500 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24),
+   volc: new Factory("volc", 5, 'Block Volcano', 'img/volc.png', 500 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30),
+   mnfm: new Factory("mnfm", 6, 'Moon Block Farm', 'img/mnfm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36),
+   plsm: new Factory("plsm", 7, 'Planetary Block Storm', 'img/plsm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42),
+   star: new Factory("star", 8, 'Star Reactor', 'img/star.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48),
+   dmgt: new Factory("dmgt", 9, 'Interdimensional Gateway', 'img/dmgt.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54)
    // The Everything Dimension?
 };
 
@@ -311,7 +322,7 @@ const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
    let y = backToBoardButton.y - h;
    CUBE_MESH.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
 
-   // Set the text color 
+   // Set the text color
    ctx2d.fillStyle = 'white';
 
    // Get fonts
