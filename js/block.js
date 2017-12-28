@@ -1,5 +1,5 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* globals UPDATES_PER_SECOND, CUBE_MESH, VISIBLE_HEIGHT, Board, toScreenX, toScreenY, getBoardX, getBoardY */
+
 const COLOR_RED = 0xff004c;
 const COLOR_ORANGE = 0xffa530;
 const COLOR_GREEN = 0x50ec8c;
