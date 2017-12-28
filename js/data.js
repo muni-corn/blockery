@@ -94,13 +94,11 @@ const Data = {
             dialog.dismiss();
          })
          .show();
-      //      localStorage.clear();
-      //      window.location.reload(false);
    },
    _currentBlocks: 0,
    set currentBlocks(val) {
       this._currentBlocks = val;
-      invokeBlockCountListeners(val);
+      Listeners.invokeBlockCountListeners(val);
    },
    get currentBlocks() {
       return this._currentBlocks;
