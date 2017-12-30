@@ -1,7 +1,7 @@
 /* jshint esversion: 6, browser: true, devel: true */
 /* global globalYOffset, UI_PADDING, CAMERA_Z, debug, VISIBLE_WIDTH, VISIBLE_HEIGHT, cubicEaseIn, cubicEaseOut, rgbToInt, intToRGB, toBrowserX, toBrowserY, toBrowserW, toBrowserH, CUBE_MESH, Board, mouseListeners */
 
-const BUTTON_TEXT_HEIGHT = 25;
+const BUTTON_DEFAULT_TEXT_HEIGHT = 25;
 const BUTTON_DEPTH = Board.BLOCK_WIDTH;
 
 let buttons = [];
@@ -39,6 +39,7 @@ class Button {
       this.text = text;
       this.action = action;
       this.typeface = "New Cicle Fina";
+      this.fontSize = BUTTON_DEFAULT_TEXT_HEIGHT;
       this.enabled = true;
 
       this.hovering = false;
@@ -114,7 +115,7 @@ class Button {
    renderTopLayer(ctx2d, buttonCenterX2D, buttonCenterY2D, toNewDepth) {
       if (!this.text) return;
       ctx2d.fillStyle = "white";
-      ctx2d.font = toBrowserH(toBrowserH(BUTTON_TEXT_HEIGHT) * toNewDepth) + "px " + this.typeface;
+      ctx2d.font = toBrowserH(toBrowserH(this.fontSize) * toNewDepth) + "px " + this.typeface;
       ctx2d.textAlign = "center";
       ctx2d.textBaseline = "middle";
       ctx2d.fillText(this.text, buttonCenterX2D, buttonCenterY2D);

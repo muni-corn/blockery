@@ -51,7 +51,6 @@ const renderUpperStage = (stageMenu, delta, gl, programInfo, ctx2d) => {
    backToBoardButton.render(delta, gl, programInfo, ctx2d);
 };
 
-
 let scoreboardFadeInter = 0;
 let scoreboardFadeDuration = 0.5;
 
@@ -136,7 +135,18 @@ const openUpperStage = (menu) => {
    yStart = globalYOffset;
    yEnd = VISIBLE_HEIGHT;
    yInter = 0;
+
+   backToBoardButton.y = -getStatusBarHeight() / 2;
 };
+
+const openLowerStage = menu => {
+   currentLowerStageMenu = menu;
+   yStart = globalYOffset;
+   yEnd = -VISIBLE_HEIGHT;
+   yInter = 0;
+
+   backToBoardButton.y = VISIBLE_HEIGHT;
+}
 
 const goBackToBoard = () => {
    yStart = globalYOffset;
@@ -158,9 +168,14 @@ const initGame = () => {
    factoriesButton = new Button(x, y, w, h / 2, COLOR_ORANGE, 'Factories', function () {
       openUpperStage(StageMenu.FACTORIES);
    });
-   statsButton = new Button(x, y + h / 2, w, h / 2, COLOR_BLUE, 'Stats', function () {
+   statsButton = new Button(x, y + h / 2, w - h / 2, h / 2, COLOR_BLUE, 'Stats', function () {
       openUpperStage(StageMenu.STATS);
    });
+   settingsButton = new Button(x + w - h / 2, y + h / 2, h / 2, h / 2, COLOR_GREEN, 'settings', function () {
+      openLowerStage(StageMenu.SETTINGS);
+   });
+   settingsButton.typeface = "Material Icons";
+   settingsButton.fontSize = 36;
    backToBoardButton = new Button(x, y - h / 2, w, h / 2, COLOR_GREEN, 'Done', function () {
       goBackToBoard();
    });
@@ -168,7 +183,9 @@ const initGame = () => {
 
 let factoriesButton;
 let statsButton;
+let settingsButton;
 const renderStatusBar = (delta, gl, programInfo, ctx2d) => {
    factoriesButton.render(delta, gl, programInfo, ctx2d);
    statsButton.render(delta, gl, programInfo, ctx2d);
+   settingsButton.render(delta, gl, programInfo, ctx2d);
 };
