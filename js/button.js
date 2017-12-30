@@ -4,6 +4,30 @@
 const BUTTON_TEXT_HEIGHT = 25;
 const BUTTON_DEPTH = Board.BLOCK_WIDTH;
 
+let buttons = [];
+
+const resetVisibleButtonFlags = () => {
+   buttons.forEach(function (button) {
+      button.visible = false;
+   });
+};
+
+mouseListeners.push({
+   onClick: function (mx, my) {
+      buttons.forEach(function (button) {
+         if (button.visible)
+            button.onClick(mx, my);
+      });
+   },
+   onMouseMove: function (mx, my) {
+      buttons.forEach(function (button) {
+         if (button.visible)
+            button.onMouseMove(mx, my);
+      });
+   }
+});
+
+
 class Button {
    constructor(x, y, w, h, color, text, action) {
       this.x = x;
@@ -21,12 +45,22 @@ class Button {
       this.pressInter = 0;
       this.pressInterVelocity = -1;
       this.liftInter = 0;
-      this.liftInterVelocity = -1;
-      mouseListeners.push(this);
+
+      // a flag to tell if the button has been rendered. it is
+      // reset at the beginning of every render loop to false,
+      // and set to true and the end of the button's
+      // render() method
+      this.visible = false;
+
+      // add this button to the pile of buttons
+      buttons.push(this);
    }
 
    onClick(mx, my) {
-      if (this.coordinateInBounds(mx, my) && this.enabled) {
+      if (!this.visible || !this.enabled)
+         return;
+
+      if (this.coordinateInBounds(mx, my)) {
          this.pressInterVelocity = 1;
          if (this.action) this.action();
       }
@@ -37,11 +71,14 @@ class Button {
    }
 
    onMouseMove(mx, my) {
-      if (this.coordinateInBounds(mx, my) && this.enabled) {
-         this.liftInterVelocity = 1;
+      if (!this.visible || !this.enabled) {
+         this.hovering = false;
+         return;
+      }
+
+      if (this.coordinateInBounds(mx, my)) {
          this.hovering = true;
       } else {
-         this.liftInterVelocity = -1;
          this.hovering = false;
       }
    }
@@ -95,7 +132,7 @@ class Button {
          this.pressInter = 1;
       }
 
-      this.liftInter += this.liftInterVelocity * delta * 2;
+      this.liftInter += (this.hovering ? 1 : -1) * delta * 2;
       if (this.liftInter < 0)
          this.liftInter = 0;
       else if (this.liftInter > 1)
@@ -109,7 +146,7 @@ class Button {
       // Get z offset of pressing the button
       let z = (this.pressInterVelocity > 0 ? cubicEaseOut(this.pressInter) : cubicEaseIn(this.pressInter)) * maxPress;
       // and displace further by the mouse-hover effect
-      z += (this.liftInterVelocity > 0 ? cubicEaseOut(this.liftInter) : cubicEaseIn(this.liftInter)) * maxLift;
+      z += (this.hovering ? cubicEaseOut(this.liftInter) : cubicEaseIn(this.liftInter)) * maxLift;
 
 
       // Render the 3D button body
@@ -134,6 +171,8 @@ class Button {
 
       // Render the text!
       this.renderTopLayer(ctx2d, toBrowserX(buttonCenterX), toBrowserY(buttonCenterY), toNewDepth);
+
+      this.visible = true;
    }
 }
 
@@ -177,9 +216,9 @@ class ImageButton extends Button {
 class ProgressButton extends Button {
    constructor(x, y, w, h, colorFill, colorEmpty, text, action) {
       super(x, y, w, h, null, text, action);
-      /** An indicator from 0 to 1 */
       this.colorFill = colorFill;
       this.colorEmpty = colorEmpty;
+      /** An indicator from 0 to 1 */
       this.progress = 0.75;
    }
 

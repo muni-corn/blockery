@@ -1,8 +1,11 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global sendNotification, renderNotifications, dialogs, renderGame, renderDialogs, Button, renderScoreboard, renderStatusBar, toBrowserX, toBrowserY, VISIBLE_HEIGHT, Data, COLOR_BLUE, Board, isMobile, intToRGB, toGLX, toGLY, globalYOffset, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
+/* global sendNotification, dialogs, renderGame, renderDialogs, Button, renderScoreboard, renderStatusBar, toBrowserX, toBrowserY, VISIBLE_HEIGHT, Data, COLOR_BLUE, Board, isMobile, intToRGB, toGLX, toGLY, globalYOffset, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
 
 // The interval in which to save in seconds
 const SAVE_INTERVAL = 60;
+
+// A developer's variable for anti-distraction purposes
+let globalBlockProductionEnabled = true;
 
 function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
    let lastSave = 0;
@@ -44,8 +47,8 @@ window.onload = () => {
       }
       if (event.ctrlKey && event.altKey && !event.repeat && event.key.toUpperCase() == "Q") {
          event.preventDefault();
-         Board.queueFillingEnabled = !Board.queueFillingEnabled;
-         sendNotification(Board.queueFillingEnabled ? "Queue filling enabled" : "Queue filling disabled for anti-distraction purposes :)", 4);
+         globalBlockProductionEnabled = !globalBlockProductionEnabled;
+         sendNotification(globalBlockProductionEnabled ? "Block production enabled!" : "Block production disabled! Use Ctrl+Alt+Q to reactivate", 4);
       }
    });
 
@@ -53,7 +56,7 @@ window.onload = () => {
    let listenerType = isMobile() ? "touchstart" : "mousedown";
 
    document.addEventListener(listenerType, function (event) {
-      onClickHandler(event);
+      clickHandler(event);
    });
    // Doesn't work with iPhones >:( >:( >:(
    // document.addEventListener('touchend', function (event) {
@@ -108,7 +111,7 @@ window.onload = () => {
 // event is fired.
 const mouseListeners = [];
 
-const onClickHandler = event => {
+const clickHandler = event => {
    // if (touched) {
    //    touched = false;
    //    return;
@@ -144,10 +147,12 @@ const onClickHandler = event => {
  * measured in seconds.
  ************************************************/
 const logic = delta => {
-   Board.logic(delta);
+   gameLogic(delta);
 };
 
 const render = (delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d) => {
+   resetVisibleButtonFlags();
+
    gl.clearColor(0.9, 0.9, 0.9, 1);
    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
    ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);

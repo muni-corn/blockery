@@ -35,7 +35,6 @@ const Board = {
       y: VISIBLE_HEIGHT / 2
    },
 
-   queueFillingEnabled: true,
    fillRate: 2 * 100, // The rate at which cubes fill in units per second
    pendingFillTime: 0,
    dropQueue: function () {
@@ -49,7 +48,7 @@ const Board = {
       if (boardFull) this.pendingFillTime = 0;
    },
    fillQueue: function (delta) {
-      if (!this.queueFillingEnabled)
+      if (!globalBlockProductionEnabled)
          return;
 
       this.pendingFillTime += delta;
@@ -274,16 +273,16 @@ const Board = {
       Data.currentBlocks++;
       switch (block.color) {
          case COLOR_RED:
-            Data.lifetimeBlocks.red++;
+            Data.lifetimeBlocksByColor.red++;
             break;
          case COLOR_ORANGE:
-            Data.lifetimeBlocks.orange++;
+            Data.lifetimeBlocksByColor.orange++;
             break;
          case COLOR_GREEN:
-            Data.lifetimeBlocks.green++;
+            Data.lifetimeBlocksByColor.green++;
             break;
          case COLOR_BLUE:
-            Data.lifetimeBlocks.blue++;
+            Data.lifetimeBlocksByColor.blue++;
             break;
       }
    },
@@ -311,7 +310,7 @@ const Board = {
 
    /************************************************
     * REMOVE IF MATCHING NEIGHBORS
-    * Kicks a block and any matching neighbors out 
+    * Kicks a block and any matching neighbors out
     * of the board grid if said matching neighbor(s)
     * exist. Returns true if so, and false otherwise.
     ************************************************/
@@ -344,7 +343,7 @@ const Board = {
     * Matches two blocks together given their
     * rows and columns. If the blocks match, the
     * neighboring blocks will be checked for more
-    * matching neighbors, and the function will 
+    * matching neighbors, and the function will
     * return true.
     ************************************************/
    matchWithNeighbor: function (blockToRemoveRow, blockToRemoveColumn, neighborRow, neighborColumn) {
