@@ -128,9 +128,11 @@ const StageMenu = {
 };
 
 let currentStage = Stage.MAIN;
-let currentUpperStageMenu;
+let currentUpperStageMenu, currentLowerStageMenu;
 
 const openUpperStage = (menu) => {
+   currentStage = Stage.UPPER;
+
    currentUpperStageMenu = menu;
    yStart = globalYOffset;
    yEnd = VISIBLE_HEIGHT;
@@ -141,6 +143,8 @@ const openUpperStage = (menu) => {
 };
 
 const openLowerStage = menu => {
+   currentStage = Stage.LOWER;
+
    currentLowerStageMenu = menu;
    yStart = globalYOffset;
    yEnd = -VISIBLE_HEIGHT;
@@ -151,6 +155,8 @@ const openLowerStage = menu => {
 };
 
 const goBackToBoard = () => {
+   currentStage = Stage.MAIN;
+
    yStart = globalYOffset;
    yEnd = 0;
    yInter = 0;
