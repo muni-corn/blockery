@@ -30,10 +30,10 @@ const Data = {
 
       this.boardCode = localStorage.getItem(KEY_GRID);
 
-      this.lifetimeBlocks.red = Number.parseInt(localStorage.getItem(KEY_LIFETIME_RED)) || 0;
-      this.lifetimeBlocks.orange = Number.parseInt(localStorage.getItem(KEY_LIFETIME_ORANGE)) || 0;
-      this.lifetimeBlocks.green = Number.parseInt(localStorage.getItem(KEY_LIFETIME_GREEN)) || 0;
-      this.lifetimeBlocks.blue = Number.parseInt(localStorage.getItem(KEY_LIFETIME_BLUE)) || 0;
+      this.lifetimeBlocksByColor.red = Number.parseInt(localStorage.getItem(KEY_LIFETIME_RED)) || 0;
+      this.lifetimeBlocksByColor.orange = Number.parseInt(localStorage.getItem(KEY_LIFETIME_ORANGE)) || 0;
+      this.lifetimeBlocksByColor.green = Number.parseInt(localStorage.getItem(KEY_LIFETIME_GREEN)) || 0;
+      this.lifetimeBlocksByColor.blue = Number.parseInt(localStorage.getItem(KEY_LIFETIME_BLUE)) || 0;
 
       this.lifetimeClicks.successful = Number.parseInt(localStorage.getItem(KEY_SUCCESSFUL_CLICKS)) || 0;
       this.lifetimeClicks.failed = Number.parseInt(localStorage.getItem(KEY_FAILED_CLICKS)) || 0;
@@ -58,10 +58,10 @@ const Data = {
       localStorage.setItem(KEY_GRID, Board.getGridCode());
 
       // Save user stats
-      localStorage.setItem(KEY_LIFETIME_RED, this.lifetimeBlocks.red);
-      localStorage.setItem(KEY_LIFETIME_ORANGE, this.lifetimeBlocks.orange);
-      localStorage.setItem(KEY_LIFETIME_GREEN, this.lifetimeBlocks.green);
-      localStorage.setItem(KEY_LIFETIME_BLUE, this.lifetimeBlocks.blue);
+      localStorage.setItem(KEY_LIFETIME_RED, this.lifetimeBlocksByColor.red);
+      localStorage.setItem(KEY_LIFETIME_ORANGE, this.lifetimeBlocksByColor.orange);
+      localStorage.setItem(KEY_LIFETIME_GREEN, this.lifetimeBlocksByColor.green);
+      localStorage.setItem(KEY_LIFETIME_BLUE, this.lifetimeBlocksByColor.blue);
       localStorage.setItem(KEY_SUCCESSFUL_CLICKS, this.lifetimeClicks.successful);
       localStorage.setItem(KEY_FAILED_CLICKS, this.lifetimeClicks.failed);
 
@@ -104,13 +104,15 @@ const Data = {
       return this._currentBlocks;
    },
    currentPollution: 0,
-   lifetimeBlocks: {
+   lifetimeBlocksByColor: {
       red: 0,
       orange: 0,
       green: 0,
-      blue: 0
+      blue: 0,
+      toxic: 0,
+      golden: 0
    },
-   lifetimePollution: () => {
+   get lifetimePollution() {
       let total = 0;
       for (let prop in factories) {
          total += factories[prop].totalPollutionProduced;

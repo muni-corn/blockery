@@ -9,10 +9,10 @@ let globalBlockRateMultiplier = 1,
    globalEmptyRateMultiplier = 1,
    globalPriceMultiplier = 1;
 
-const PRICE_INCREASE = 1.5; // 150%
+const PRICE_INCREASE = 1.25; // 125%
 const BASE_EMPTY_RATE = 100;
 
-const PURCHASE_BUTTON_SIZE = Board.BLOCK_WIDTH * 4;
+const PURCHASE_BUTTON_SIZE = Board.BLOCK_WIDTH * 3;
 const STORAGE_BUTTON_HEIGHT = Board.BLOCK_WIDTH * 1.5;
 
 let factoriesUnlocked = 0;
@@ -46,7 +46,7 @@ class Factory {
 
       this.progressButton = new ProgressButton(getStatusBarX(), 0, getStatusBarWidth(), STORAGE_BUTTON_HEIGHT, COLOR_GREEN, COLOR_DARK_GREEN, '', () => {
          this.empty();
-      }); //TODO
+      });
       this.progressButton.typeface = 'Digital-7';
 
       this.imageButton = new ImageButton(getStatusBarX(), 0, PURCHASE_BUTTON_SIZE, PURCHASE_BUTTON_SIZE, COLOR_BLUE, "img/unknown.png", () => {
@@ -73,6 +73,8 @@ class Factory {
    }
 
    produceBlocks(delta) {
+
+
       if (this.emptying) {
 
          let emptiedBlocks = this.totalEmptyRate * delta;
@@ -87,6 +89,7 @@ class Factory {
             this.blocksHeld -= Math.floor(this.blocksHeld);
             this.emptying = false;
          } else {
+
             // Otherwise, just empty the blocks as expected and return from this
             // function so that we do not produce blocks while we empty
             this.blocksHeld -= emptiedBlocks;
@@ -95,6 +98,10 @@ class Factory {
          }
 
       }
+
+
+      if (!globalBlockProductionEnabled)
+         return;
 
       // Produce blocks and pollution
       if (this.blocksHeld < this.totalCapacity) {
@@ -186,33 +193,38 @@ class Factory {
       ctx2d.textBaseline = 'top';
       ctx2d.fillStyle = 'black';
 
+      // Header
       let textX = toBrowserX(this.imageButton.x + this.imageButton.w + UI_PADDING);
       let textY = toBrowserY(this.imageButton.y);
-
-      // Header
       ctx2d.font = toBrowserH(DIALOG_TITLE_TEXT_HEIGHT) + 'px New Cicle Fina';
-      ctx2d.fillText(hidden ? '???' : this.name, textX, textY);
-
+      ctx2d.fillText(hidden ? 'Under Construction' : this.name, textX, textY);
 
       // Info //
       ctx2d.font = getSansFont();
       ctx2d.textBaseline = 'alphabetical';
       textY = toBrowserY(this.imageButton.y + DIALOG_TITLE_TEXT_HEIGHT * 1.15);
 
-      ctx2d.fillText('Costs ' + this.price.toLocaleString(), textX, textY);
-      ctx2d.fillText('Produces ' + this.singularBlockRate.toLocaleString() + ' blocks per second', textX, textY + toBrowserH(UI_SANS_TEXT_HEIGHT) * 1.15);
+      ctx2d.fillText('Costs ' + this.price.toLocaleString() + ' for +' + this.singularBlockRate.toLocaleString() + ' bps', textX, textY);
 
+      // If this factory is owned...
       if (this.amountOwned > 0) {
+         // ...declare 'full' if its capacity has been reached...
          if (this.blocksHeld === this.totalCapacity) {
-            ctx2d.fillText('Full', textX, textY + toBrowserH(UI_SANS_TEXT_HEIGHT) * 2 * 1.15);
+            ctx2d.fillText('Full', textX, textY + toBrowserH(UI_SANS_TEXT_HEIGHT) * 1.15);
+            // ...or, display how much time it will take until it is full (if not emptying)
+            // or empty (if emptying)
          } else {
-            // Starts in seconds
+            // Get the time remaining...
             let timeLeft;
             if (this.emptying)
+               // ...until empty
                timeLeft = this.blocksHeld / this.totalEmptyRate;
             else
+               // ... until full
                timeLeft = (this.totalCapacity - this.blocksHeld) / this.totalBlockRate;
 
+            // By default, time is measured in seconds but reduced to larger
+            // time units if timeLeft is too large
             let timeUnit = 'seconds';
 
             if (timeLeft >= 3600 * 24 * 7) {
@@ -228,14 +240,16 @@ class Factory {
                timeLeft /= 60;
                timeUnit = 'minutes';
             }
-            // ceiling for no decimal places and premature zeros
-            timeLeft = Math.ceil(timeLeft);
 
-            // proper English
-            if (timeUnit === 'seconds' && timeLeft === 1)
-               timeUnit = timeUnit.substr(0, timeUnit.length - 1);
+            if (timeUnit === 'seconds') {
+               // round (up) to tenths of seconds
+               timeLeft = (Math.ceil(timeLeft * 10) / 10).toFixed(1);
+            } else {
+               // or just ceiling everything else
+               timeLeft = Math.ceil(timeLeft);
+            }
 
-            ctx2d.fillText((this.emptying ? 'Empty in ' : 'Full in ') + timeLeft + ' ' + timeUnit, textX, textY + toBrowserH(UI_SANS_TEXT_HEIGHT) * 2 * 1.15);
+            ctx2d.fillText((this.emptying ? 'Empty in ' : 'Full in ') + timeLeft + ' ' + timeUnit, textX, textY + toBrowserH(UI_SANS_TEXT_HEIGHT) * 1.15);
          }
 
          this.progressButton.enabled = !this.emptying;
@@ -278,6 +292,12 @@ let factories = {
    // The Everything Dimension?
 };
 
+const factoriesLogic = delta => {
+   for (let prop in factories) {
+      factories[prop].logic(delta);
+   }
+};
+
 let backToBoardButton;
 let nextPageButton, previousPageButton;
 const PAGE_CHANGER_BUTTON_WIDTH = 150;
@@ -296,30 +316,20 @@ const renderFactoryMenu = (delta, gl, programInfo, ctx2d) => {
       factories[prop].logic(delta);
       factories[prop].renderOptions(delta, gl, programInfo, ctx2d);
    }
-   if (!backToBoardButton) {
-      let x = getStatusBarX();
-      let y = 0;
-      let w = getStatusBarWidth();
-      let h = getStatusBarHeight();
-      backToBoardButton = new Button(x, y - h / 2, w, h / 2, COLOR_GREEN, 'Done', function () {
-         goBackToBoard();
-      });
-   }
    if (previousPageButton)
       previousPageButton.render(delta, gl, programInfo, ctx2d);
    if (nextPageButton)
       nextPageButton.render(delta, gl, programInfo, ctx2d);
    renderFactoryMenuScoreboard(gl, programInfo, ctx2d);
-   backToBoardButton.render(delta, gl, programInfo, ctx2d);
 };
 
 const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
    // Render the block
    CUBE_MESH.setColor(COLOR_BLUE, gl, programInfo);
    let h = getStatusBarHeight();
-   let w = backToBoardButton.w;
-   let x = backToBoardButton.x;
-   let y = backToBoardButton.y - h;
+   let w = getStatusBarWidth();
+   let x = getStatusBarX();
+   let y = -h * 1.5;
    CUBE_MESH.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
 
    // Set the text color
