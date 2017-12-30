@@ -15,7 +15,8 @@ function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
       if (!isNaN(now)) {
          let delta = (now - then) / 1000;
          then = now;
-         logic(delta);
+         gameLogic(delta);
+         debug.innerHTML = now.toFixed(1);
          render(delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d);
 
          if (now - lastSave >= SAVE_INTERVAL * 1000) {
