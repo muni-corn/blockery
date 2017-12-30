@@ -115,7 +115,7 @@ class Block {
    }
 
    get gone() {
-      return this.y > VISIBLE_HEIGHT * 1.3;
+      return this.y > toGLY(window.innerHeight - toBrowserY(globalYOffset)) * 1.3;
    }
 
    renderBlock(gl, programInfo) {
