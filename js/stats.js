@@ -30,14 +30,7 @@ const Stats = {
    }
 };
 
-/**
- * @returns the y-coordinate where the next statistic can be rendered.
- * @param {string} statName
- * @param {string} statValue
- * @param {CanvasRenderingContext2D} ctx2d
- * @param {number} textY
- * @param {number} maxWidth
- */
+/** Returns the y-coordinate where the next statistic can be rendered */
 const renderBigStat = (statName, statValue, ctx2d, textY, maxWidth) => {
    ctx2d.fillStyle = 'black';
    ctx2d.textBaseline = 'top';
@@ -55,6 +48,25 @@ const renderBigStat = (statName, statValue, ctx2d, textY, maxWidth) => {
    return textY + 75 + UI_PADDING;
 };
 
+/** Returns the y-coordinate where the next statistic can be rendered */
+const renderSmallStat = (statName, statValue, ctx2d, textY) => {
+   ctx2d.fillStyle = "black";
+   ctx2d.textBaseline = "alphabetic";
+
+   ctx2d.textAlign = "left";
+   ctx2d.fillText(statName, toBrowserX(UI_PADDING), toBrowserY(textY));
+
+   ctx2d.textAlign = "right";
+   ctx2d.fillText(statValue, toBrowserX(VISIBLE_WIDTH - UI_PADDING), toBrowserY(textY));
+
+   ctx2d.beginPath();
+   ctx2d.setLineDash([1, 3]);
+   ctx2d.moveTo(toBrowserX(UI_PADDING + 5) + ctx2d.measureText(statName).width, toBrowserY(textY));
+   ctx2d.lineTo(toBrowserX(VISIBLE_WIDTH - UI_PADDING - 5) - ctx2d.measureText(statValue).width, toBrowserY(textY));
+   ctx2d.stroke();
+   return textY + UI_SANS_TEXT_HEIGHT * 1.25;
+};
+
 const renderStats = ctx2d => {
    let maxWidth = toBrowserW(VISIBLE_WIDTH - UI_PADDING * 2);
    let textY = -VISIBLE_HEIGHT + getStatusBarHeight() + UI_PADDING;
@@ -62,23 +74,39 @@ const renderStats = ctx2d => {
    textY = renderBigStat('Lifetime blocks produced or collected', Math.floor(Stats.lifetimeBlocksCollected).toLocaleString(), ctx2d, textY, maxWidth);
    textY = renderBigStat('Lifetime pollutants produced', Math.floor(Data.lifetimePollution).toLocaleString(), ctx2d, textY, maxWidth);
 
-   let numStats = 5;
-   let textX = toBrowserX(UI_PADDING);
-   ctx2d.textAlign = "left";
-   ctx2d.font = getSansFont();
-   for (let i = 0; i < numStats; i++) {
-      switch (i) {
-         case 0:
-            let total = 0;
-            for (let prop in Data.lifetimeBlocksByColor)
-               total += Data.lifetimeBlocksByColor[prop];
+   /* Render small stats */
+   textY += UI_PADDING;
 
-            ctx2d.fillText(total.toLocaleString() + " total blocks collected by hand", textX, toBrowserY(textY));
-            break;
-         case 1:
-            ctx2d.fillText("Favorite block color: " + Stats.favoriteColor, textX, toBrowserY(textY));
-            break;
-      }
-      textY += UI_SANS_TEXT_HEIGHT * 1.15;
-   }
+   let total = 0;
+   for (let prop in Data.lifetimeBlocksByColor)
+      total += Data.lifetimeBlocksByColor[prop];
+
+   ctx2d.font = getSansFont();
+   ctx2d.strokeStyle = "black";
+   ctx2d.lineWidth = 1;
+
+   // Block stats
+   textY = renderSmallStat("Lifetime blocks collected by hand", total.toLocaleString(), ctx2d, textY);
+   textY = renderSmallStat("Red blocks", Data.lifetimeBlocksByColor.red.toLocaleString(), ctx2d, textY);
+   textY = renderSmallStat("Orange blocks", Data.lifetimeBlocksByColor.orange.toLocaleString(), ctx2d, textY);
+   textY = renderSmallStat("Green blocks", Data.lifetimeBlocksByColor.green.toLocaleString(), ctx2d, textY);
+   textY = renderSmallStat("Blue blocks", Data.lifetimeBlocksByColor.blue.toLocaleString(), ctx2d, textY);
+
+   // Adds a gap
+   textY += UI_SANS_TEXT_HEIGHT * 1.25;
+
+   // Click stats
+   textY = renderSmallStat("Successful block clicks", Data.lifetimeClicks.successful.toLocaleString(), ctx2d, textY);
+   textY = renderSmallStat("Failed block clicks", Data.lifetimeClicks.failed.toLocaleString(), ctx2d, textY);
+
+   // Adds a gap
+   textY += UI_SANS_TEXT_HEIGHT * 1.25;
+
+   // Factory stats
+   let totalFactories = 0;
+   for (let prop in factories)
+      totalFactories += factories[prop].amountOwned;
+   textY = renderSmallStat("Total factories owned", totalFactories, ctx2d, textY);
+   textY = renderSmallStat("Lifetime blocks produced by factories", Math.floor(Stats.lifetimeBlocksProducedByFactories).toLocaleString(), ctx2d, textY);
+
 };
