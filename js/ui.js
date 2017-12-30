@@ -23,3 +23,18 @@ const removeShadow = (ctx) => {
    ctx.shadowBlur = 0;
    ctx.shadowOffsetY = 0;
 };
+
+const Theme = {
+   background: {
+      r: 0.9,
+      g: 0.9,
+      b: 0.9
+   },
+   settings: {
+      background: {
+         r: 0.1,
+         g: 0.1,
+         b: 0.2
+      }
+   }
+};

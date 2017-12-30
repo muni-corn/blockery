@@ -153,7 +153,14 @@ const logic = delta => {
 const render = (delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d) => {
    resetVisibleButtonFlags();
 
-   gl.clearColor(0.9, 0.9, 0.9, 1);
+   let bgInter = Math.max(0, Math.min(1, globalYOffset / -VISIBLE_HEIGHT));
+
+   let bgR = Theme.background.r * (1 - bgInter) + Theme.settings.background.r * bgInter;
+   let bgG = Theme.background.g * (1 - bgInter) + Theme.settings.background.g * bgInter;
+   let bgB = Theme.background.b * (1 - bgInter) + Theme.settings.background.b * bgInter;
+
+
+   gl.clearColor(bgR, bgG, bgB, 1);
    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
    ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
 
