@@ -51,7 +51,7 @@ function init() {
       initCulling(gl);
       matrices = getMatrices(gl, programInfo);
       initLighting(gl, programInfo);
-      CUBE_MESH.init(gl, matrices, programInfo);
+      CubeMesh.init(gl, matrices, programInfo);
 
       window.onresize();
 

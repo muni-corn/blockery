@@ -219,33 +219,33 @@ const Board = {
       // Declare a shorter name for frame thickness
       let t = this.FRAME_THICKNESS;
 
-      CUBE_MESH.setColor(0xffffff, gl, programInfo);
+      CubeMesh.setColor(0xffffff, gl, programInfo);
 
       // Left side of frame
       let lw = t;
       let lh = Board.height + this.GRID_PADDING;
       let lx = this.boardCenter.x - this.width / 2 - this.GRID_PADDING - t;
       let ly = this.boardCenter.y - this.height / 2;
-      CUBE_MESH.render(gl, lx, ly, 0, lw, lh, t);
+      CubeMesh.render(gl, lx, ly, 0, lw, lh, t);
 
       // Right side of frame
       let rw = lw;
       let rh = lh;
       let rx = this.boardCenter.x + this.width / 2 + this.GRID_PADDING;
       let ry = ly;
-      CUBE_MESH.render(gl, rx, ry, 0, rw, rh, t);
+      CubeMesh.render(gl, rx, ry, 0, rw, rh, t);
 
       //  Bottom of the frame
       let bh = t;
       let bw = Board.width + t * 2 + this.GRID_PADDING * 2;
       let bx = lx;
       let by = this.boardCenter.y + this.height / 2 + this.GRID_PADDING;
-      CUBE_MESH.render(gl, bx, by, 0, bw, bh, t);
+      CubeMesh.render(gl, bx, by, 0, bw, bh, t);
 
       // Lights
-      CUBE_MESH.setColor(lightColor, gl, programInfo);
-      CUBE_MESH.render(gl, lx, ly - t, 0, t, t, t);
-      CUBE_MESH.render(gl, rx, ry - t, 0, t, t, t);
+      CubeMesh.setColor(lightColor, gl, programInfo);
+      CubeMesh.render(gl, lx, ly - t, 0, t, t, t);
+      CubeMesh.render(gl, rx, ry - t, 0, t, t, t);
    },
    blinkLights(color, count = 2) {
       color = intToRGB(color);

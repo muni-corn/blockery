@@ -322,12 +322,12 @@ const renderFactoryMenu = (delta, gl, programInfo, ctx2d) => {
 
 const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
    // Render the block
-   CUBE_MESH.setColor(COLOR_BLUE, gl, programInfo);
+   CubeMesh.setColor(COLOR_BLUE, gl, programInfo);
    let h = getStatusBarHeight();
    let w = getStatusBarWidth();
    let x = getStatusBarX();
    let y = -h * 1.5;
-   CUBE_MESH.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
+   CubeMesh.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
 
    // Set the text color
    ctx2d.fillStyle = 'white';
