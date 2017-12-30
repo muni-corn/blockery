@@ -137,6 +137,7 @@ const openUpperStage = (menu) => {
    yInter = 0;
 
    backToBoardButton.y = -getStatusBarHeight() / 2;
+   backToBoardButton.text = 'keyboard_arrow_down';
 };
 
 const openLowerStage = menu => {
@@ -146,6 +147,7 @@ const openLowerStage = menu => {
    yInter = 0;
 
    backToBoardButton.y = VISIBLE_HEIGHT;
+   backToBoardButton.text = 'keyboard_arrow_up';
 };
 
 const goBackToBoard = () => {
@@ -176,9 +178,12 @@ const initGame = () => {
    });
    settingsButton.typeface = "Material Icons";
    settingsButton.fontSize = 36;
-   backToBoardButton = new Button(x, y - h / 2, w, h / 2, COLOR_GREEN, 'Done', function () {
+
+   backToBoardButton = new Button(x, y - h / 2, w, h / 2, COLOR_RED, 'keyboard arrow down', function () {
       goBackToBoard();
    });
+   backToBoardButton.typeface = "Material Icons";
+   backToBoardButton.fontSize = 36;
 };
 
 let factoriesButton;
