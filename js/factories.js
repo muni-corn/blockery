@@ -225,19 +225,19 @@ class Factory {
             // time units if timeLeft is too large
             let timeUnit = 'seconds';
 
-            // if (timeLeft >= 3600 * 24 * 7) {
-            //    timeLeft /= 3600 * 24 * 7;
-            //    timeUnit = 'weeks';
-            // } else if (timeLeft >= 3600 * 24) {
-            //    timeLeft /= 3600 * 24;
-            //    timeUnit = 'days';
-            // } else if (timeLeft >= 3600) {
-            //    timeLeft /= 3600;
-            //    timeUnit = 'hours';
-            // } else if (timeLeft >= 60) {
-            //    timeLeft /= 60;
-            //    timeUnit = 'minutes';
-            // }
+            if (timeLeft >= 3600 * 24 * 7) {
+               timeLeft /= 3600 * 24 * 7;
+               timeUnit = 'weeks';
+            } else if (timeLeft >= 3600 * 24) {
+               timeLeft /= 3600 * 24;
+               timeUnit = 'days';
+            } else if (timeLeft >= 3600) {
+               timeLeft /= 3600;
+               timeUnit = 'hours';
+            } else if (timeLeft >= 60) {
+               timeLeft /= 60;
+               timeUnit = 'minutes';
+            }
 
             if (timeUnit === 'seconds') {
                // round (up) to tenths of seconds
