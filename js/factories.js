@@ -321,6 +321,9 @@ const renderFactoryMenu = (delta, gl, programInfo, ctx2d) => {
       previousPageButton.render(delta, gl, programInfo, ctx2d);
    if (nextPageButton)
       nextPageButton.render(delta, gl, programInfo, ctx2d);
+
+   
+
    renderFactoryMenuScoreboard(gl, programInfo, ctx2d);
 };
 
@@ -366,19 +369,23 @@ const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
 
 const checkPageButtons = () => {
    if (!nextPageButton) {
-      nextPageButton = new Button(getStatusBarX() + getStatusBarWidth() - PAGE_CHANGER_BUTTON_WIDTH, getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "Next Page", function () {
+      nextPageButton = new Button(getStatusBarX() + getStatusBarWidth() - PAGE_CHANGER_BUTTON_WIDTH, getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_right", function () {
          if (currentFactoryPage < getMaxPage())
             currentFactoryPage++;
          checkPageButtons();
       });
+      nextPageButton.typeface = "Material Icons";
+      nextPageButton.fontSize = 36;
    }
 
    if (!previousPageButton) {
-      previousPageButton = new Button(getStatusBarX(), getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "Previous Page", function () {
+      previousPageButton = new Button(getStatusBarX(), getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_left", function () {
          if (currentFactoryPage > 0)
             currentFactoryPage--;
          checkPageButtons();
       });
+      previousPageButton.typeface = "Material Icons";
+      previousPageButton.fontSize = 36;
    }
 
    nextPageButton.enabled = currentFactoryPage < getMaxPage();
