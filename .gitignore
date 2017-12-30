@@ -1,4 +1,4 @@
 package.json
 bs-config.json
-.vscode/
+.vscode/*
 jsconfig.json
