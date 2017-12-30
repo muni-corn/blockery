@@ -180,7 +180,9 @@ class Factory {
 
       // Assign an easier variable for UI_PADDING
       let p = UI_PADDING;
-      let y = -VISIBLE_HEIGHT + this.index % FACTORIES_PER_PAGE * Factory.infoCardHeight + (VISIBLE_HEIGHT + getPageChangerButtonY()) / 2 - (Factory.infoCardHeight * 3 - UI_PADDING * 2) / 2;
+
+      let statusBarHeight = getStatusBarHeight();
+      let y = -VISIBLE_HEIGHT + statusBarHeight + (VISIBLE_HEIGHT + getPageChangerButtonY() - statusBarHeight) / 2 - (Factory.infoCardHeight * FACTORIES_PER_PAGE - UI_PADDING * 2) / 2 + this.index % FACTORIES_PER_PAGE * Factory.infoCardHeight;
 
       this.imageButton.enabled = Data.currentBlocks >= this.price && !hidden;
       this.imageButton.y = y;
@@ -318,7 +320,11 @@ const renderFactoryMenu = (delta, gl, programInfo, ctx2d) => {
    if (nextPageButton)
       nextPageButton.render(delta, gl, programInfo, ctx2d);
 
-   
+   ctx2d.font = toBrowserH(UI_SANS_TEXT_HEIGHT * 1.5) + "px New Cicle Fina";
+   ctx2d.fillStyle = "black";
+   ctx2d.textBaseline = "middle";
+   ctx2d.textAlign = "center";
+   ctx2d.fillText((currentFactoryPage + 1) + " / " + (getMaxPage() + 1), toBrowserX(VISIBLE_WIDTH / 2), toBrowserY(getPageChangerButtonY() + nextPageButton.h / 2));
 
    renderFactoryMenuScoreboard(gl, programInfo, ctx2d);
 };
@@ -365,7 +371,7 @@ const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
 
 const checkPageButtons = () => {
    if (!nextPageButton) {
-      nextPageButton = new Button(getStatusBarX() + getStatusBarWidth() - PAGE_CHANGER_BUTTON_WIDTH, getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_right", function () {
+      nextPageButton = new Button(getStatusBarX() + getStatusBarWidth() - PAGE_CHANGER_BUTTON_HEIGHT, getPageChangerButtonY(), PAGE_CHANGER_BUTTON_HEIGHT, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_right", function () {
          if (currentFactoryPage < getMaxPage())
             currentFactoryPage++;
          checkPageButtons();
@@ -375,7 +381,7 @@ const checkPageButtons = () => {
    }
 
    if (!previousPageButton) {
-      previousPageButton = new Button(getStatusBarX(), getPageChangerButtonY(), PAGE_CHANGER_BUTTON_WIDTH, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_left", function () {
+      previousPageButton = new Button(getStatusBarX(), getPageChangerButtonY(), PAGE_CHANGER_BUTTON_HEIGHT, PAGE_CHANGER_BUTTON_HEIGHT, COLOR_ORANGE, "keyboard_arrow_left", function () {
          if (currentFactoryPage > 0)
             currentFactoryPage--;
          checkPageButtons();
