@@ -108,8 +108,8 @@ class Button {
    }
 
    renderBody(gl, programInfo, z) {
-      CUBE_MESH.setColor(this.enabled ? (this.addHighlightToColor(this.color)) : this.disabledColor, gl, programInfo);
-      CUBE_MESH.render(gl, this.x, this.y, z, this.w, this.h, BUTTON_DEPTH);
+      CubeMesh.setColor(this.enabled ? (this.addHighlightToColor(this.color)) : this.disabledColor, gl, programInfo);
+      CubeMesh.render(gl, this.x, this.y, z, this.w, this.h, BUTTON_DEPTH);
    }
 
    renderTopLayer(ctx2d, buttonCenterX2D, buttonCenterY2D, toNewDepth) {
@@ -224,10 +224,10 @@ class ProgressButton extends Button {
    }
 
    renderBody(gl, programInfo, z) {
-      CUBE_MESH.setColor(this.addHighlightToColor(this.colorFill), gl, programInfo);
-      CUBE_MESH.render(gl, this.x, this.y, z, this.w * this.progress, this.h, BUTTON_DEPTH);
+      CubeMesh.setColor(this.addHighlightToColor(this.colorFill), gl, programInfo);
+      CubeMesh.render(gl, this.x, this.y, z, this.w * this.progress, this.h, BUTTON_DEPTH);
 
-      CUBE_MESH.setColor(this.enabled ? this.addHighlightToColor(this.colorEmpty) : this.toGrayscale(this.colorEmpty), gl, programInfo);
-      CUBE_MESH.render(gl, this.x + this.w * this.progress, this.y, z, this.w * (1 - this.progress), this.h, BUTTON_DEPTH);
+      CubeMesh.setColor(this.enabled ? this.addHighlightToColor(this.colorEmpty) : this.toGrayscale(this.colorEmpty), gl, programInfo);
+      CubeMesh.render(gl, this.x + this.w * this.progress, this.y, z, this.w * (1 - this.progress), this.h, BUTTON_DEPTH);
    }
 }

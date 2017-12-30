@@ -127,7 +127,7 @@ class Block {
       let w = Board.BLOCK_WIDTH * ((f * 5 > 1) ? 1 : (f * 5));
       let h = bw * f;
 
-      CUBE_MESH.setColor(this.color, gl, programInfo);
-      CUBE_MESH.render(gl, this.x + (bw - w) / 2, this.y + bw - h, this.z, w, h, w, this.pit, this.yaw, this.rol);
+      CubeMesh.setColor(this.color, gl, programInfo);
+      CubeMesh.render(gl, this.x + (bw - w) / 2, this.y + bw - h, this.z, w, h, w, this.pit, this.yaw, this.rol);
    }
 }
