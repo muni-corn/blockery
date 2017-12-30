@@ -16,7 +16,6 @@ function main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers) {
          let delta = (now - then) / 1000;
          then = now;
          gameLogic(delta);
-         debug.innerHTML = now.toFixed(1);
          render(delta, gl, matrices, programInfo, buffers, canvas2d, ctx2d);
 
          if (now - lastSave >= SAVE_INTERVAL * 1000) {
