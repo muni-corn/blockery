@@ -56,12 +56,12 @@ let scoreboardFadeDuration = 0.5;
 
 const renderScoreboard = (delta, gl, programInfo, ctx2d) => {
    // Render the block
-   CUBE_MESH.setColor(COLOR_BLUE, gl, programInfo);
+   CubeMesh.setColor(COLOR_BLUE, gl, programInfo);
    let x = Board.boardCenter.x - Board.width / 2 - Board.GRID_PADDING - Board.FRAME_THICKNESS;
    let y = Board.boardCenter.y + Board.height / 2 + Board.GRID_PADDING + Board.FRAME_THICKNESS * 2;
    let w = Board.width + Board.FRAME_THICKNESS * 2 + Board.GRID_PADDING * 2;
    let h = VISIBLE_HEIGHT - y;
-   CUBE_MESH.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
+   CubeMesh.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
 
    // Set the text color //
    // If there are falling blocks from the board
@@ -146,7 +146,7 @@ const openLowerStage = menu => {
    yInter = 0;
 
    backToBoardButton.y = VISIBLE_HEIGHT;
-}
+};
 
 const goBackToBoard = () => {
    yStart = globalYOffset;
