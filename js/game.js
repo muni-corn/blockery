@@ -11,57 +11,67 @@ const renderGame = (delta, gl, programInfo, matrices, ctx2d) => {
       if (yInter > 1)
          yInter = 1;
       globalYOffset = yStart + quintEaseOut(yInter) * (yEnd - yStart);
-
    }
-   // Set the camera offset
-   setCameraOffset(0, globalYOffset, matrices.world, programInfo.uniformLocations.worldMatrix);
-   ctx2d.translate(0, toBrowserY(globalYOffset));
-
    // Main stage
-   renderMainStage(delta, gl, programInfo, ctx2d);
+   if (yInter < 1 || currentStage === Stage.MAIN)
+      renderMainStage(delta, gl, programInfo, ctx2d, globalYOffset);
 
    // Render upper stage
-   renderUpperStage(currentUpperStageMenu, delta, gl, programInfo, ctx2d);
+   if (yInter < 1 || currentStage === Stage.UPPER)
+      renderUpperStage(currentUpperStageMenu, delta, gl, programInfo, ctx2d, globalYOffset - VISIBLE_HEIGHT);
+
+   // Render lower stage
+   if (yInter < 1 || currentStage === Stage.LOWER)
+      renderLowerStage(currentLowerStageMenu, delta, gl, programInfo, ctx2d, globalYOffset + VISIBLE_HEIGHT);
 };
 
-const renderMainStage = (delta, gl, programInfo, ctx2d) => {
-   Board.render(gl, programInfo);
-   renderScoreboard(delta, gl, programInfo, ctx2d);
-   renderStatusBar(delta, gl, programInfo, ctx2d);
+const renderMainStage = (delta, gl, programInfo, ctx2d, yOffset) => {
+   Board.render(gl, programInfo, yOffset);
+   renderScoreboard(delta, gl, programInfo, ctx2d, yOffset);
+   renderStatusBar(delta, gl, programInfo, ctx2d, yOffset);
 };
 
-const renderUpperStage = (stageMenu, delta, gl, programInfo, ctx2d) => {
+const renderUpperStage = (stageMenu, delta, gl, programInfo, ctx2d, yOffset) => {
    ctx2d.font = toBrowserH(DIALOG_TITLE_TEXT_HEIGHT) + 'px New Cicle Fina';
    ctx2d.fillStyle = 'black';
    ctx2d.textBaseline = 'middle';
    ctx2d.textBaseline = 'center';
-   ctx2d.fillText(stageMenu, toBrowserX(getStatusBarX() + getStatusBarWidth() / 2), toBrowserY(getStatusBarHeight() / 2 - VISIBLE_HEIGHT));
+   ctx2d.fillText(stageMenu, toBrowserX(getStatusBarX() + getStatusBarWidth() / 2), toBrowserY(getStatusBarHeight() / 2 + yOffset));
    switch (stageMenu) {
       case StageMenu.FACTORIES:
-         renderFactoryMenu(delta, gl, programInfo, ctx2d);
+         renderFactoryMenu(delta, gl, programInfo, ctx2d, yOffset);
          break;
       case StageMenu.UPGRADES:
          break;
       case StageMenu.STATS:
-         renderStats(ctx2d);
+         renderStats(ctx2d, yOffset);
          break;
       case StageMenu.ACHIEVEMENTS:
          break;
    }
-   backToBoardButton.render(delta, gl, programInfo, ctx2d);
+   upperStageBackButton.render(delta, gl, programInfo, ctx2d, yOffset);
+};
+
+const renderLowerStage = (stageMenu, delta, gl, programInfo, ctx2d, yOffset) => {
+   // switch (stageMenu) {
+   //    case StageMenu.SETTINGS:
+   renderSettings(delta, gl, programInfo, ctx2d, yOffset);
+   //       break;
+   // }
+   lowerStageBackButton.render(delta, gl, programInfo, ctx2d, yOffset);
 };
 
 let scoreboardFadeInter = 0;
 let scoreboardFadeDuration = 0.5;
 
-const renderScoreboard = (delta, gl, programInfo, ctx2d) => {
+const renderScoreboard = (delta, gl, programInfo, ctx2d, yOffset) => {
    // Render the block
    CubeMesh.setColor(COLOR_BLUE, gl, programInfo);
    let x = Board.boardCenter.x - Board.width / 2 - Board.GRID_PADDING - Board.FRAME_THICKNESS;
    let y = Board.boardCenter.y + Board.height / 2 + Board.GRID_PADDING + Board.FRAME_THICKNESS * 2;
    let w = Board.width + Board.FRAME_THICKNESS * 2 + Board.GRID_PADDING * 2;
    let h = VISIBLE_HEIGHT - y;
-   CubeMesh.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
+   CubeMesh.render(gl, x, y + yOffset, 0, w, h, Board.BLOCK_WIDTH);
 
    // Set the text color //
    // If there are falling blocks from the board
@@ -84,7 +94,7 @@ const renderScoreboard = (delta, gl, programInfo, ctx2d) => {
    let cicleFont = toBrowserY(35) + 'px New Cicle Fina';
 
    let blocksTextX = toBrowserX(x + w - Board.FRAME_THICKNESS);
-   let textY = toBrowserH(y + h / 2 + textHeight / 2);
+   let textY = toBrowserH(y + h / 2 + textHeight / 2 + yOffset);
 
    ctx2d.textBaseline = 'alphabetic';
    ctx2d.textAlign = 'right';
@@ -137,9 +147,6 @@ const openUpperStage = (menu) => {
    yStart = globalYOffset;
    yEnd = VISIBLE_HEIGHT;
    yInter = 0;
-
-   backToBoardButton.y = -getStatusBarHeight() / 2;
-   backToBoardButton.text = 'keyboard_arrow_down';
 };
 
 const openLowerStage = menu => {
@@ -149,9 +156,6 @@ const openLowerStage = menu => {
    yStart = globalYOffset;
    yEnd = -VISIBLE_HEIGHT;
    yInter = 0;
-
-   backToBoardButton.y = VISIBLE_HEIGHT;
-   backToBoardButton.text = 'keyboard_arrow_up';
 };
 
 const goBackToBoard = () => {
@@ -164,7 +168,7 @@ const goBackToBoard = () => {
 
 let yStart = 0;
 let yEnd = 0;
-let yInter = 0;
+let yInter = 1;
 let yOffsetAnimateDuration = 0.5;
 
 const initGame = () => {
@@ -185,18 +189,24 @@ const initGame = () => {
    settingsButton.typeface = "Material Icons";
    settingsButton.fontSize = 36;
 
-   backToBoardButton = new Button(x, y - h / 2, w, h / 2, COLOR_RED, 'keyboard arrow down', function () {
+   upperStageBackButton = new Button(x, VISIBLE_HEIGHT - h / 2, w, h / 2, COLOR_RED, 'keyboard_arrow_down', function () {
       goBackToBoard();
    });
-   backToBoardButton.typeface = "Material Icons";
-   backToBoardButton.fontSize = 36;
+   upperStageBackButton.typeface = "Material Icons";
+   upperStageBackButton.fontSize = 36;
+
+   lowerStageBackButton = new Button(x, 0, w, h / 2, COLOR_RED, 'keyboard_arrow_up', function () {
+      goBackToBoard();
+   });
+   lowerStageBackButton.typeface = "Material Icons";
+   lowerStageBackButton.fontSize = 36;
 };
 
 let factoriesButton;
 let statsButton;
 let settingsButton;
-const renderStatusBar = (delta, gl, programInfo, ctx2d) => {
-   factoriesButton.render(delta, gl, programInfo, ctx2d);
-   statsButton.render(delta, gl, programInfo, ctx2d);
-   settingsButton.render(delta, gl, programInfo, ctx2d);
+const renderStatusBar = (delta, gl, programInfo, ctx2d, yOffset) => {
+   factoriesButton.render(delta, gl, programInfo, ctx2d, yOffset);
+   statsButton.render(delta, gl, programInfo, ctx2d, yOffset);
+   settingsButton.render(delta, gl, programInfo, ctx2d, yOffset);
 };

@@ -4,7 +4,7 @@ const COLOR_RED = 0xff004c;
 const COLOR_ORANGE = 0xffa530;
 const COLOR_GREEN = 0x50ec8c;
 const COLOR_BLUE = 0x117cff;
-const COLOR_POISON = 0x000000;
+const COLOR_TOXIC = 0x000000;
 const BOUNCE_FACTOR = 0.25;
 const GRAVITY = 1500;
 
@@ -64,7 +64,7 @@ class Block {
    }
 
    get destY() {
-      return Board.toGridY(this.row) + (this.row >= 0 && this.color == COLOR_POISON ? Board.SPACING : 0);
+      return Board.toGridY(this.row) + (this.row >= 0 && this.color == COLOR_TOXIC ? Board.SPACING : 0);
    }
 
    blockLogic(delta, row, col) {
@@ -118,7 +118,7 @@ class Block {
       return this.y > toGLY(window.innerHeight - toBrowserY(globalYOffset)) * 1.3;
    }
 
-   renderBlock(gl, programInfo) {
+   renderBlock(gl, programInfo, yOffset) {
       let f = this._fill / 100;
       // Re-assign the fill variable for a cool cubic-easing animation effect ;)
       f--;
@@ -128,6 +128,6 @@ class Block {
       let h = bw * f;
 
       CubeMesh.setColor(this.color, gl, programInfo);
-      CubeMesh.render(gl, this.x + (bw - w) / 2, this.y + bw - h, this.z, w, h, w, this.pit, this.yaw, this.rol);
+      CubeMesh.render(gl, this.x + (bw - w) / 2, this.y + bw - h + yOffset, this.z, w, h, w, this.pit, this.yaw, this.rol);
    }
 }
