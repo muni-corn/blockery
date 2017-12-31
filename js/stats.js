@@ -72,7 +72,7 @@ const renderStats = (ctx2d, yOffset) => {
    let textY = getStatusBarHeight() + UI_PADDING + yOffset;
 
    textY = renderBigStat('Lifetime blocks produced or collected', Math.floor(Stats.lifetimeBlocksCollected).toLocaleString(), ctx2d, textY, maxWidth);
-   textY = renderBigStat('Lifetime pollutants produced', Math.floor(Data.lifetimePollution).toLocaleString(), ctx2d, textY, maxWidth);
+   // textY = renderBigStat('Lifetime pollutants produced', Math.floor(Data.lifetimePollution).toLocaleString(), ctx2d, textY, maxWidth);
 
    /* Render small stats */
    textY += UI_PADDING;
