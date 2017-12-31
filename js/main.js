@@ -1,5 +1,4 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global sendNotification, dialogs, renderGame, renderDialogs, Button, renderScoreboard, renderStatusBar, toBrowserX, toBrowserY, VISIBLE_HEIGHT, Data, COLOR_BLUE, Board, isMobile, intToRGB, toGLX, toGLY, globalYOffset, Block, COLOR_RED, mat4, glMatrix, main, bindMatrix, CUBE_MESH */
 
 // The interval in which to save in seconds
 const SAVE_INTERVAL = 60;
@@ -73,7 +72,7 @@ window.onload = () => {
    document.addEventListener('mousemove', function (event) {
       // Convert to GL space
       let x = toGLX(event.clientX);
-      let y = toGLY(event.clientY) - globalYOffset;
+      let y = toGLY(event.clientY);
 
       // If a dialog is showing, ignore input
       if (dialogs.length > 0) {
@@ -92,7 +91,7 @@ window.onload = () => {
       lastTouchY = event.touches[0].clientY;
 
       etx = event.touches[0].clientX;
-      ety = event.touches[0].clientY - globalYOffset;
+      ety = event.touches[0].clientY;
 
       mouseListeners.forEach(listener => {
          if (listener.onMouseMove)
@@ -128,7 +127,7 @@ const clickHandler = event => {
 
    // Convert to GL space
    x = toGLX(x || etx);
-   y = toGLY(y || ety) - globalYOffset;
+   y = toGLY(y || ety);
 
    // Ignore input with a dialog showing
    if (dialogs.length > 0) {

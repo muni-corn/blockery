@@ -40,7 +40,6 @@ function init() {
       bindMatrix(matrices.proj, programInfo.uniformLocations.projMatrix);
    };
 
-
    getShaders(result => {
       shaders = result;
       programInfo = getShaderProgramInfo(gl, shaders);
@@ -58,9 +57,11 @@ function init() {
       main(glCanvas, gl, canvas2d, ctx2d, programInfo, matrices, buffers);
    });
 
-   // Initialize everything else
+   /* Initialize everything else */
    Board.init(ctx2d, Data.boardCode);
    initGame();
+   initSettings();
+
 }
 
 function error(error) {

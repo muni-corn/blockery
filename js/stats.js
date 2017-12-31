@@ -67,9 +67,9 @@ const renderSmallStat = (statName, statValue, ctx2d, textY) => {
    return textY + UI_SANS_TEXT_HEIGHT * 1.25;
 };
 
-const renderStats = ctx2d => {
+const renderStats = (ctx2d, yOffset) => {
    let maxWidth = toBrowserW(VISIBLE_WIDTH - UI_PADDING * 2);
-   let textY = -VISIBLE_HEIGHT + getStatusBarHeight() + UI_PADDING;
+   let textY = getStatusBarHeight() + UI_PADDING + yOffset;
 
    textY = renderBigStat('Lifetime blocks produced or collected', Math.floor(Stats.lifetimeBlocksCollected).toLocaleString(), ctx2d, textY, maxWidth);
    textY = renderBigStat('Lifetime pollutants produced', Math.floor(Data.lifetimePollution).toLocaleString(), ctx2d, textY, maxWidth);

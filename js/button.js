@@ -34,6 +34,7 @@ class Button {
       this.y = y;
       this.w = w;
       this.h = h;
+      this.yOffset = 0;
       this.color = color;
       this.disabledColor = this.toGrayscale(color);
       this.text = text;
@@ -68,7 +69,7 @@ class Button {
    }
 
    coordinateInBounds(x, y) {
-      return x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h;
+      return x >= this.x && x <= this.x + this.w && y >= this.y + this.yOffset && y <= this.y+this.yOffset + this.h;
    }
 
    onMouseMove(mx, my) {
@@ -109,7 +110,7 @@ class Button {
 
    renderBody(gl, programInfo, z) {
       CubeMesh.setColor(this.enabled ? (this.addHighlightToColor(this.color)) : this.disabledColor, gl, programInfo);
-      CubeMesh.render(gl, this.x, this.y, z, this.w, this.h, BUTTON_DEPTH);
+      CubeMesh.render(gl, this.x, this.y + this.yOffset, z, this.w, this.h, BUTTON_DEPTH);
    }
 
    renderTopLayer(ctx2d, buttonCenterX2D, buttonCenterY2D, toNewDepth) {
@@ -121,7 +122,8 @@ class Button {
       ctx2d.fillText(this.text, buttonCenterX2D, buttonCenterY2D);
    }
 
-   render(delta, gl, programInfo, ctx2d) {
+   render(delta, gl, programInfo, ctx2d, yOffset) {
+      this.yOffset = yOffset||0;
 
       // Interpolation properties for animation //
 
@@ -166,9 +168,9 @@ class Button {
       let xDistanceFromCenter = toBrowserY(VISIBLE_WIDTH / 2 - (this.x + this.w / 2)) * toNewDepth;
       let buttonCenterX = VISIBLE_WIDTH / 2 - xDistanceFromCenter;
 
-      // Calculate the new y coordinate in gl space, compensating for the global y offset
-      let yDistanceFromCenter = toBrowserY(VISIBLE_HEIGHT / 2 - (this.y + this.h / 2 + globalYOffset)) * toNewDepth;
-      let buttonCenterY = VISIBLE_HEIGHT / 2 - yDistanceFromCenter - globalYOffset;
+      // Calculate the new y coordinate in gl space
+      let yDistanceFromCenter = toBrowserY(VISIBLE_HEIGHT / 2 - (this.y + this.yOffset + this.h / 2)) * toNewDepth;
+      let buttonCenterY = VISIBLE_HEIGHT / 2 - yDistanceFromCenter;
 
       // Render the text!
       this.renderTopLayer(ctx2d, toBrowserX(buttonCenterX), toBrowserY(buttonCenterY), toNewDepth);
@@ -223,11 +225,13 @@ class ProgressButton extends Button {
       this.progress = 0.75;
    }
 
-   renderBody(gl, programInfo, z) {
+   renderBody(gl, programInfo, z, yOffset) {
+      this.yOffset = yOffset || 0;
+
       CubeMesh.setColor(this.addHighlightToColor(this.colorFill), gl, programInfo);
-      CubeMesh.render(gl, this.x, this.y, z, this.w * this.progress, this.h, BUTTON_DEPTH);
+      CubeMesh.render(gl, this.x, this.y+this.yOffset, z, this.w * this.progress, this.h, BUTTON_DEPTH);
 
       CubeMesh.setColor(this.enabled ? this.addHighlightToColor(this.colorEmpty) : this.toGrayscale(this.colorEmpty), gl, programInfo);
-      CubeMesh.render(gl, this.x + this.w * this.progress, this.y, z, this.w * (1 - this.progress), this.h, BUTTON_DEPTH);
+      CubeMesh.render(gl, this.x + this.w * this.progress, this.y+this.yOffset, z, this.w * (1 - this.progress), this.h, BUTTON_DEPTH);
    }
 }

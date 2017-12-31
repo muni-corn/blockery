@@ -1,5 +1,5 @@
 /* jshint esversion: 6, browser: true, devel: true */
-/* global intToRGBText, globalYOffset, COLOR_RED, COLOR_ORANGE, COLOR_GREEN, intToARGBText, applyShadow, removeShadow, UI_MAX_ALPHA, getSansFont, UI_SHADOW, UI_SANS_TEXT_HEIGHT, UI_PADDING, mouseListeners, getWrappedLines, quintEaseOut, toGLX, toGLY, toBrowserX, toBrowserY, toBrowserW, toBrowserH, cubicEaseOut, VISIBLE_WIDTH, VISIBLE_HEIGHT */
+
 let dialogs = [];
 
 const DIALOG_ANIMATE_DURATION = 0.25;
@@ -42,7 +42,6 @@ class Dialog {
    }
 
    onClick(mx, my) {
-      my+=globalYOffset;
       this.positiveButton.onClick(mx, my);
       if (this.negativeButton)
          this.negativeButton.onClick(mx, my);
@@ -51,7 +50,6 @@ class Dialog {
    }
 
    onMouseMove(mx, my) {
-      my+=globalYOffset;
       this.positiveButton.onMouseMove(mx, my);
       if (this.negativeButton)
          this.negativeButton.onMouseMove(mx, my);
@@ -232,7 +230,7 @@ class DialogButton {
    }
 
    static get FONT() {
-      return toBrowserH(DIALOG_BUTTON_TEXT_HEIGHT) + " px New Cicle Fina";
+      return toBrowserH(DIALOG_BUTTON_TEXT_HEIGHT) + "px New Cicle Fina";
    }
 
    render(browserX, browserY, backgroundColor, textColor) {
@@ -262,7 +260,6 @@ class RedDialog extends Dialog {
 }
 
 let backgroundInter = 0;
-
 
 const renderDialogs = (delta, gl, programInfo, ctx2d) => {
    ctx2d.fillStyle = "rgba(0, 0, 0," + cubicEaseOut(backgroundInter) * 0.5 + ")";
