@@ -34,6 +34,7 @@ const Board = {
       x: VISIBLE_WIDTH / 2,
       y: VISIBLE_HEIGHT / 2
    },
+   yOffset: 0,
 
    fillRate: 2 * 100, // The rate at which cubes fill in units per second
    pendingFillTime: 0,
@@ -144,7 +145,7 @@ const Board = {
 
                // If a poison block reaches the bottom, remove it
                // (and inflict punishment >:))
-               if (r === this.ROWS - 1 && block.color === COLOR_POISON) {
+               if (r === this.ROWS - 1 && block.color === COLOR_TOXIC) {
                   this.pushBlockToDump(r, c);
                }
             } else if (r > 0) {
@@ -186,36 +187,37 @@ const Board = {
 
    },
 
-   render: function (gl, programInfo) {
-      this.renderBoardFrame(gl, programInfo);
-      this.renderGrid(gl, programInfo);
-      this.renderQueue(gl, programInfo);
-      this.renderDumpBlocks(gl, programInfo);
+   render: function (gl, programInfo, yOffset) {
+      this.yOffset = yOffset;
+      this.renderBoardFrame(gl, programInfo, yOffset);
+      this.renderGrid(gl, programInfo, yOffset);
+      this.renderQueue(gl, programInfo, yOffset);
+      this.renderDumpBlocks(gl, programInfo, yOffset);
    },
-   renderQueue: function (gl, programInfo) {
+   renderQueue: function (gl, programInfo, yOffset) {
       // Render the queue
       for (let i = 0; i < this.COLUMNS; i++) {
          let block = this.queue[i];
          if (block !== null)
-            block.renderBlock(gl, programInfo);
+            block.renderBlock(gl, programInfo, yOffset);
       }
    },
-   renderGrid: function (gl, programInfo) {
+   renderGrid: function (gl, programInfo, yOffset) {
       for (let r = 0; r < this.ROWS; r++) {
          for (let c = 0; c < this.COLUMNS; c++) {
             let block = this.board[r][c];
             if (block !== null)
-               block.renderBlock(gl, programInfo);
+               block.renderBlock(gl, programInfo, yOffset);
          }
       }
    },
-   renderDumpBlocks: function (gl, programInfo) {
+   renderDumpBlocks: function (gl, programInfo, yOffset) {
       // Render any falling blocks
       this.dumpBlocks.forEach((item, index, array) => {
-         item.renderBlock(gl, programInfo);
+         item.renderBlock(gl, programInfo, yOffset);
       });
    },
-   renderBoardFrame: function (gl, programInfo) {
+   renderBoardFrame: function (gl, programInfo, yOffset) {
       // Declare a shorter name for frame thickness
       let t = this.FRAME_THICKNESS;
 
@@ -225,7 +227,7 @@ const Board = {
       let lw = t;
       let lh = Board.height + this.GRID_PADDING;
       let lx = this.boardCenter.x - this.width / 2 - this.GRID_PADDING - t;
-      let ly = this.boardCenter.y - this.height / 2;
+      let ly = this.boardCenter.y - this.height / 2 + yOffset;
       CubeMesh.render(gl, lx, ly, 0, lw, lh, t);
 
       // Right side of frame
@@ -239,7 +241,7 @@ const Board = {
       let bh = t;
       let bw = Board.width + t * 2 + this.GRID_PADDING * 2;
       let bx = lx;
-      let by = this.boardCenter.y + this.height / 2 + this.GRID_PADDING;
+      let by = this.boardCenter.y + this.height / 2 + this.GRID_PADDING + yOffset;
       CubeMesh.render(gl, bx, by, 0, bw, bh, t);
 
       // Lights
@@ -267,8 +269,10 @@ const Board = {
       this.board[row][col] = null;
    },
    countBlock: function (block) {
-      if (block.color === COLOR_POISON)
+      if (block.color === COLOR_TOXIC) {
+         Data.lifetimeBlocksByColor.toxic++;
          return;
+      }
 
       Data.currentBlocks++;
       switch (block.color) {
@@ -364,7 +368,7 @@ const Board = {
    },
    onClick: function (mx, my) {
       let slotSize = this.BLOCK_WIDTH + this.SPACING;
-      let row = Math.floor((my - this.boardCenter.y + (this.height / 2) - this.SPACING) / slotSize - 1);
+      let row = Math.floor((my - this.boardCenter.y - this.yOffset + (this.height / 2) - this.SPACING) / slotSize - 1);
       let col = Math.floor((mx - this.boardCenter.x + (this.width / 2)) / slotSize);
 
       if (row >= 0 && row < this.ROWS && col >= 0 && col < this.COLUMNS)

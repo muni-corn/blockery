@@ -169,7 +169,7 @@ class Factory {
       return Math.floor(this.index / FACTORIES_PER_PAGE) == currentFactoryPage;
    }
 
-   renderOptions(delta, gl, programInfo, ctx2d) {
+   renderOptions(delta, gl, programInfo, ctx2d, yOffset) {
       if (!this.visibleOnPage || this.index > factoriesUnlocked) {
          this.imageButton.enabled = false;
          this.progressButton.enabled = false;
@@ -186,7 +186,7 @@ class Factory {
       let p = UI_PADDING;
 
       let statusBarHeight = getStatusBarHeight();
-      let y = -VISIBLE_HEIGHT + statusBarHeight + (VISIBLE_HEIGHT + getPageChangerButtonY() - statusBarHeight) / 2 - (Factory.infoCardHeight * FACTORIES_PER_PAGE - UI_PADDING * 2) / 2 + this.index % FACTORIES_PER_PAGE * Factory.infoCardHeight;
+      let y = statusBarHeight + (getPageChangerButtonY() - statusBarHeight) / 2 - (Factory.infoCardHeight * FACTORIES_PER_PAGE - UI_PADDING * 2) / 2 + this.index % FACTORIES_PER_PAGE * Factory.infoCardHeight + yOffset;
 
       this.imageButton.enabled = Data.currentBlocks >= this.price && !hidden;
       this.imageButton.y = y;
@@ -302,44 +302,46 @@ const factoriesLogic = delta => {
    }
 };
 
-let backToBoardButton;
+let upperStageBackButton;
 let nextPageButton, previousPageButton;
 const PAGE_CHANGER_BUTTON_WIDTH = 150;
 const PAGE_CHANGER_BUTTON_HEIGHT = 50;
 
 const getPageChangerButtonY = () => {
-   return -getStatusBarHeight() * 1.5 - UI_PADDING - PAGE_CHANGER_BUTTON_HEIGHT;
+   return VISIBLE_HEIGHT - getStatusBarHeight() * 1.5 - UI_PADDING - PAGE_CHANGER_BUTTON_HEIGHT;
 };
 
 const getMaxPage = () => {
    return Math.floor(factoriesUnlocked / FACTORIES_PER_PAGE);
 };
 
-const renderFactoryMenu = (delta, gl, programInfo, ctx2d) => {
+const renderFactoryMenu = (delta, gl, programInfo, ctx2d, yOffset) => {
    for (let prop in factories) {
-      factories[prop].renderOptions(delta, gl, programInfo, ctx2d);
+      factories[prop].renderOptions(delta, gl, programInfo, ctx2d, yOffset);
    }
    if (previousPageButton)
-      previousPageButton.render(delta, gl, programInfo, ctx2d);
+      previousPageButton.render(delta, gl, programInfo, ctx2d, yOffset);
+
    if (nextPageButton)
-      nextPageButton.render(delta, gl, programInfo, ctx2d);
+      nextPageButton.render(delta, gl, programInfo, ctx2d, yOffset);
+
 
    ctx2d.font = toBrowserH(UI_SANS_TEXT_HEIGHT * 1.5) + "px New Cicle Fina";
    ctx2d.fillStyle = "black";
    ctx2d.textBaseline = "middle";
    ctx2d.textAlign = "center";
-   ctx2d.fillText((currentFactoryPage + 1) + " / " + (getMaxPage() + 1), toBrowserX(VISIBLE_WIDTH / 2), toBrowserY(getPageChangerButtonY() + nextPageButton.h / 2));
+   ctx2d.fillText((currentFactoryPage + 1) + " / " + (getMaxPage() + 1), toBrowserX(VISIBLE_WIDTH / 2), toBrowserY(getPageChangerButtonY() + nextPageButton.h / 2 + yOffset));
 
-   renderFactoryMenuScoreboard(gl, programInfo, ctx2d);
+   renderFactoryMenuScoreboard(gl, programInfo, ctx2d, yOffset);
 };
 
-const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
+const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d, yOffset) => {
    // Render the block
    CubeMesh.setColor(COLOR_BLUE, gl, programInfo);
    let h = getStatusBarHeight();
    let w = getStatusBarWidth();
    let x = getStatusBarX();
-   let y = -h * 1.5;
+   let y = VISIBLE_HEIGHT - h * 1.5 + yOffset;
    CubeMesh.render(gl, x, y, 0, w, h, Board.BLOCK_WIDTH);
 
    // Set the text color
@@ -347,8 +349,8 @@ const renderFactoryMenuScoreboard = (gl, programInfo, ctx2d) => {
 
    // Get fonts
    let textHeight = 50;
-   let monospaceFont = toBrowserY(textHeight) + 'px Digital-7';
-   let cicleFont = toBrowserY(textHeight / 2) + 'px New Cicle Fina';
+   let monospaceFont = toBrowserH(textHeight) + 'px Digital-7';
+   let cicleFont = toBrowserH(textHeight / 2) + 'px New Cicle Fina';
 
    let blocksTextX = toBrowserX(x + w - Board.FRAME_THICKNESS);
    let textY = toBrowserY(y + h / 2 + textHeight / 2);
