@@ -57,7 +57,7 @@ class Firework {
       for (let i = 0; i < NUM_FIREWORK_PARTICLES; i++) {
          let angle = 2 * Math.PI * i / NUM_FIREWORK_PARTICLES;
          let particleX = this.x + Math.sin(angle) * d;
-         let particleY = this.y + Math.cos(angle) * d + globalYOffset;
+         let particleY = this.y + Math.cos(angle) * d;
          ctx2d.fillRect(toBrowserX(particleX - s / 2), toBrowserY(particleY - s / 2), s, s);
       }
    }
