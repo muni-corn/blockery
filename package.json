@@ -5,5 +5,8 @@
   "scripts": {
     "dev": "lite-server"
   },
-  "author": "Harrison Thorne"
+  "author": "Harrison Thorne",
+  "devDependencies": {
+    "lite-server": "^2.5.4"
+  }
 }
