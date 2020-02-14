@@ -279,16 +279,16 @@ class Factory {
 
 // Excuse this mess
 let factories = {
-   smit: new Factory("smit", 0, 'Blocksmith', 'img/smit.png', 500, 0.5, 0.1, 50),
-   cott: new Factory("cott", 1, 'Cottage Factory', 'img/cott.png', 500 * 15, 0.5 * 4, 0.1 * 5, 50 * 6),
-   mine: new Factory("mine", 2, 'Block Mine', 'img/mine.png', 500 * 15 * 15, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12),
-   powh: new Factory("powh", 3, 'Powerhouse', 'img/powh.png', 500 * 15 * 15 * 15, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18),
-   clmk: new Factory("clmk", 4, 'Cloudmaker', 'img/clmk.png', 500 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24),
-   volc: new Factory("volc", 5, 'Block Volcano', 'img/volc.png', 500 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30),
-   mnfm: new Factory("mnfm", 6, 'Moon Block Farm', 'img/mnfm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36),
-   plsm: new Factory("plsm", 7, 'Planetary Block Storm', 'img/plsm.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42),
-   star: new Factory("star", 8, 'Star Reactor', 'img/star.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48),
-   dmgt: new Factory("dmgt", 9, 'Interdimensional Gateway', 'img/dmgt.png', 500 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15 * 15, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54)
+   smit: new Factory("smit", 0, 'Blocksmith', 'img/smit.png', 250, 0.5, 0.1, 50),
+   cott: new Factory("cott", 1, 'Cottage factory', 'img/cott.png', 250 * 12, 0.5 * 4, 0.1 * 5, 50 * 6),
+   mine: new Factory("mine", 2, 'Block mine', 'img/mine.png', 250 * 12 * 12, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12),
+   powh: new Factory("powh", 3, 'Powerhouse', 'img/powh.png', 250 * 12 * 12 * 12, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18),
+   clmk: new Factory("clmk", 4, 'Cloudmaker', 'img/clmk.png', 250 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24),
+   volc: new Factory("volc", 5, 'Block volcano', 'img/volc.png', 250 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30),
+   mnfm: new Factory("mnfm", 6, 'Moon block farm', 'img/mnfm.png', 250 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36),
+   plsm: new Factory("plsm", 7, 'Planetary block storm', 'img/plsm.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42),
+   star: new Factory("star", 8, 'Star reactor', 'img/star.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48),
+   dmgt: new Factory("dmgt", 9, 'Interdimensional gateway', 'img/dmgt.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54)
    // The Everything Dimension?
 };
 
