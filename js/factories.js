@@ -197,7 +197,7 @@ class Factory {
       let textX = toBrowserX(this.imageButton.x + this.imageButton.w + UI_PADDING);
       let textY = toBrowserY(this.imageButton.y);
       ctx2d.font = toBrowserH(DIALOG_TITLE_TEXT_HEIGHT) + 'px New Cicle Fina';
-      ctx2d.fillText(hidden ? 'Under Construction' : this.name, textX, textY);
+      ctx2d.fillText(hidden ? 'Under construction' : this.name, textX, textY);
 
       // Info //
       ctx2d.font = getSansFont();
@@ -277,18 +277,29 @@ class Factory {
    }
 }
 
+const FACTORY_SMIT = new Factory("smit", 0, 'Blocksmith', 'img/smit.png', 250, 0.5, 0.1, 50);
+const FACTORY_COTT = new Factory("cott", 1, 'Cottage factory', 'img/cott.png', FACTORY_SMIT.basePrice * 12, 0.5 * 4, 0.1 * 5, 50 * 6);
+const FACTORY_MINE = new Factory("mine", 2, 'Block mine', 'img/mine.png', FACTORY_COTT.basePrice * 12, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12);
+const FACTORY_POWH = new Factory("powh", 3, 'Powerhouse', 'img/powh.png', FACTORY_MINE.basePrice * 12, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18);
+const FACTORY_CLMK = new Factory("clmk", 4, 'Cloudmaker', 'img/clmk.png', FACTORY_POWH.basePrice * 12, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24);
+const FACTORY_VOLC = new Factory("volc", 5, 'Block volcano', 'img/volc.png', FACTORY_CLMK.basePrice * 12, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30);
+const FACTORY_MNFM = new Factory("mnfm", 6, 'Moon block farm', 'img/mnfm.png', FACTORY_VOLC.basePrice * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36);
+const FACTORY_PLSM = new Factory("plsm", 7, 'Planetary block storm', 'img/plsm.png', FACTORY_MNFM.basePrice * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42);
+const FACTORY_STAR = new Factory("star", 8, 'Star reactor', 'img/star.png', FACTORY_PLSM.basePrice * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48);
+const FACTORY_DMGT = new Factory("dmgt", 9, 'Interdimensional gateway', 'img/dmgt.png', FACTORY_STAR.basePrice * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54);
+
 // Excuse this mess
 let factories = {
-   smit: new Factory("smit", 0, 'Blocksmith', 'img/smit.png', 250, 0.5, 0.1, 50),
-   cott: new Factory("cott", 1, 'Cottage factory', 'img/cott.png', 250 * 12, 0.5 * 4, 0.1 * 5, 50 * 6),
-   mine: new Factory("mine", 2, 'Block mine', 'img/mine.png', 250 * 12 * 12, 0.5 * 4 * 8, 0.1 * 5 * 10, 50 * 6 * 12),
-   powh: new Factory("powh", 3, 'Powerhouse', 'img/powh.png', 250 * 12 * 12 * 12, 0.5 * 4 * 8 * 12, 0.1 * 5 * 10 * 15, 50 * 6 * 12 * 18),
-   clmk: new Factory("clmk", 4, 'Cloudmaker', 'img/clmk.png', 250 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16, 0.1 * 5 * 10 * 15 * 20, 50 * 6 * 12 * 18 * 24),
-   volc: new Factory("volc", 5, 'Block volcano', 'img/volc.png', 250 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20, 0.1 * 5 * 10 * 15 * 20 * 25, 50 * 6 * 12 * 18 * 24 * 30),
-   mnfm: new Factory("mnfm", 6, 'Moon block farm', 'img/mnfm.png', 250 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24, 0.1 * 5 * 10 * 15 * 20 * 25 * 30, 50 * 6 * 12 * 18 * 24 * 30 * 36),
-   plsm: new Factory("plsm", 7, 'Planetary block storm', 'img/plsm.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42),
-   star: new Factory("star", 8, 'Star reactor', 'img/star.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48),
-   dmgt: new Factory("dmgt", 9, 'Interdimensional gateway', 'img/dmgt.png', 250 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12 * 12, 0.5 * 4 * 8 * 12 * 16 * 20 * 24 * 28 * 32 * 36, 0.1 * 5 * 10 * 15 * 20 * 25 * 30 * 35 * 40 * 45, 50 * 6 * 12 * 18 * 24 * 30 * 36 * 42 * 48 * 54)
+    smit: FACTORY_SMIT,
+    cott: FACTORY_COTT,
+    mine: FACTORY_MINE,
+    powh: FACTORY_POWH,
+    clmk: FACTORY_CLMK,
+    volc: FACTORY_VOLC,
+    mnfm: FACTORY_MNFM,
+    plsm: FACTORY_PLSM,
+    star: FACTORY_STAR,
+    dmgt: FACTORY_DMGT,
    // The Everything Dimension?
 };
 
