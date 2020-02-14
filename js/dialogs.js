@@ -226,7 +226,7 @@ class DialogButton {
    get width() {
       let ctx = this.dialog.ctx;
       ctx.font = DialogButton.FONT;
-      return toBrowserW(UI_PADDING * 2) + ctx.measureText(this.text.toUpperCase()).width;
+      return toBrowserW(UI_PADDING * 2) + ctx.measureText(this.text).width;
    }
 
    static get FONT() {
@@ -244,7 +244,7 @@ class DialogButton {
       ctx.fillStyle = textColor;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
-      ctx.fillText(this.text.toUpperCase(), browserX + this.width / 2, browserY + toBrowserY(DIALOG_BUTTON_HEIGHT / 2));
+      ctx.fillText(this.text, browserX + this.width / 2, browserY + toBrowserY(DIALOG_BUTTON_HEIGHT / 2));
    }
 }
 
