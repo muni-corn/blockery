@@ -1,0 +1,11 @@
+[package]
+name = "blockery-rs"
+version = "0.1.0"
+authors = ["municorn <municorn@musicaloft.com>"]
+edition = "2018"
+
+[dependencies]
+bevy = { git = "https://github.com/bevyengine/bevy", rev = "90586a4c461cde86b8a0e08f0770894e7cf30862", default-features = false }
+cgmath = "0.17"
+rand = "0.7"
+wasm-bindgen = "0.2"
