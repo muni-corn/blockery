@@ -1,5 +1,1 @@
-package.json
-bs-config.json
-.vscode/*
-jsconfig.json
-node_modules/
+target/
