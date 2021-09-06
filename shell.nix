@@ -3,6 +3,9 @@ with pkgs;
 mkShell {
   buildInputs = [
     cargo
+    clang
+    glibc
+    lld
     pkgconfig
     udev
     alsaLib
