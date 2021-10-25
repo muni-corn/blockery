@@ -49,38 +49,40 @@ impl Default for Board {
 
 impl Board {
     fn drop_queue(&self) {
-        let board_full = true;
+        let mut board_full = true;
         for i in 0..self.COLUMNS {
-            if (self.board[0][i].is_none()) {
+            if self.board[0][i].is_none() {
                 self.board[0][i] = self.queue[i];
-                self.queue[i] = null;
+                self.queue[i] = None;
                 board_full = false;
             }
         }
-        if (board_full) { self.pending_fill_time = 0 };
+        if board_full {
+            self.pending_fill_time = 0
+        };
     }
 
-    fn fill_queue (&self, delta: f32) {
-        if (!global_block_production_enabled) {
+    fn fill_queue(&self, delta: f32) {
+        if !global_block_production_enabled {
             return;
         }
 
         self.pending_fill_time += delta;
         let should_drop = true;
         for i in 0..COLUMNS {
-            if (!self.queue[i]) {
+            if !self.queue[i] {
                 self.queue[i] = Block::new();
             }
             let block = self.queue[i];
 
-            if ((i == 0 || self.queue[i - 1].is_full()) && !block.is_full()) {
+            if (i == 0 || self.queue[i - 1].is_full()) && !block.is_full() {
                 let f = self.queue[i].fill;
                 self.queue[i].fill += self.fill_rate * self.pending_fill_time;
                 self.pending_fill_time -= (self.queue[i].fill - f) / self.fill_rate;
                 should_drop = false;
             }
         }
-        if (should_drop) {
+        if should_drop {
             self.drop_queue();
         }
     }
@@ -89,10 +91,10 @@ impl Board {
         let code = "";
         for r in 0..ROWS {
             for c in 0..COLUMNS {
-                if (!self.board[r][c]) {
+                if !self.board[r][c] {
                     code += "0";
                 } else {
-                    match (self.board[r][c].color) {
+                    match self.board[r][c].color {
                         COLOR_RED => code += "r",
                         COLOR_ORANGE => code += "o",
                         COLOR_GREEN => code += "g",
@@ -104,23 +106,27 @@ impl Board {
         code
     }
 
-    fn init<CanvasContext>(ctx_2d: CanvasContext, board_code: &str) {
-        self.ctx_2d = ctx_2d;
+    fn init<CanvasContext>(
+        ctx_2d: CanvasContext,
+        board_code: &str,
+        mouse_listeners: &mut Listeners,
+    ) -> Self {
+        let grid = [[None; ROWS]; COLUMNS];
+        let queue = [None; COLUMNS];
         for r in 0..ROWS {
-            self.board[r] = [];
             for c in 0..COLUMNS {
-                let code_index = r * self.COLUMNS + c;
+                let code_index = r * COLUMNS + c;
                 let color;
-                if (board_code && (color = board_code[code_index]) != "0") {
-                    self.board[r][c] = Block::new(color);
+                if board_code && (color = board_code[code_index]) != "0" {
+                    grid[r][c] = Some(Block::new(color));
                     continue;
                 }
-                self.board[r][c] = null;
+                grid[r][c] = None;
             }
         }
 
         for i in 0..COLUMNS {
-            self.queue[i] = null;
+            queue[i] = None;
         }
 
         mouse_listeners.push(self);
@@ -156,9 +162,9 @@ impl Board {
                         self.pushBlockToDump(r, c);
                     }
                 } else if (r > 0) {
-                    // If self slot doesn't have a block and self
+                    // If this slot doesn't have a block and this
                     // isn't the first row, then move the block
-                    // above self slot to self slot
+                    // above this slot to this slot
                     for i in r..=0 {
                         let block_above = self.board[i][c];
                         if (block_above != null) {
@@ -189,10 +195,10 @@ impl Board {
                 // destination y position
                 item.fall();
             }
-            if (item.gone)
-                { self.countBlock(self.dump_blocks.splice(index, 1)[0]); }
+            if (item.gone) {
+                self.countBlock(self.dump_blocks.splice(index, 1)[0]);
+            }
         }
-
     }
 
     fn render<Gl>(&self, gl: Gl, program_info: ProgramInfo, y_offset: f32) {
@@ -304,7 +310,9 @@ impl Board {
 
     fn to_grid_y(row: i32) {
         let top = self.boardCenter.y - self.height / 2;
-        if (row == -1) { top } else {
+        if (row == -1) {
+            top
+        } else {
             top +
                 // Add a row and spacing to accomodate the queue
                 (row + 1) * (self.BLOCK_WIDTH + self.SPACING) +
@@ -329,7 +337,7 @@ impl Board {
         let block = self.board[row][col];
 
         if (!block) {
-            return false
+            return false;
         }
 
         let had_match = false;
@@ -359,12 +367,18 @@ impl Board {
     /// Matches two blocks together given their rows and columns. If the blocks match, the
     /// neighboring blocks will be checked for more matching neighbors, and the fn will
     /// true.
-    fn match_with_neighbor(&self, block_to_remove_row: i32, block_to_remove_column: i32, neighbor_row: i32, neighbor_column: i32) -> bool {
+    fn match_with_neighbor(
+        &self,
+        block_to_remove_row: i32,
+        block_to_remove_column: i32,
+        neighbor_row: i32,
+        neighbor_column: i32,
+    ) -> bool {
         let block_to_remove = self.board[block_to_remove_row][block_to_remove_column];
         let neighbor = self.board[neighbor_row][neighbor_column];
 
         if (!block_to_remove || !neighbor) {
-            return false
+            return false;
         }
 
         if (neighbor.color == block_to_remove.color) {
@@ -382,7 +396,11 @@ impl Board {
 
     fn on_click(&self, mx: i32, my: i32, data: &mut Data) {
         let block_cell_size = BLOCK_WIDTH + BLOCK_GAP;
-        let row = ((my - self.board_center.y - self.y_offset_+ (self.height / 2) - self.BLOCK_GAP) / block_cell_size - 1).floor();
+        let row = ((my - self.board_center.y - self.y_offset_ + (self.height / 2)
+            - self.BLOCK_GAP)
+            / block_cell_size
+            - 1)
+        .floor();
         let col = ((mx - self.board_center.x + (self.width / 2)) / block_cell_size).floor();
 
         if (row >= 0 && row < self.ROWS && col >= 0 && col < self.COLUMNS) {
