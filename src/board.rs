@@ -35,8 +35,8 @@ impl Default for Board {
 
             y_offset: 0.0,
 
-            fill_rate: 2 * 100, // The rate at which cubes fill in units per second
-
+            fill_rate: 2 * 100, // The rate at which cubes fill in units per second (100 units per
+            // block)
             queue: [None; COLUMNS],
             block_grid: [[None; ROWS]; COLUMNS],
 
@@ -48,6 +48,7 @@ impl Default for Board {
 }
 
 impl Board {
+    /// TODO: old code.
     fn drop_queue(&self) {
         let mut board_full = true;
         for i in 0..self.COLUMNS {
@@ -62,6 +63,7 @@ impl Board {
         };
     }
 
+    /// TODO: old code.
     fn fill_queue(&self, delta: f32) {
         if !global_block_production_enabled {
             return;
@@ -87,6 +89,7 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn get_grid_code(&self) {
         let code = "";
         for r in 0..ROWS {
@@ -106,6 +109,7 @@ impl Board {
         code
     }
 
+    /// TODO: old code.
     fn init<CanvasContext>(
         ctx_2d: CanvasContext,
         board_code: &str,
@@ -130,8 +134,11 @@ impl Board {
         }
 
         mouse_listeners.push(self);
+
+        todo!()
     }
 
+    /// TODO: old code.
     fn logic(delta: f32) {
         let is_blink_color = blinkR != 0 || blinkG != 0 || blinkB != 0;
         if (is_blink_color && (blinkTime < blinkEnd || blinkEnd == 0)) {
@@ -201,14 +208,16 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn render<Gl>(&self, gl: Gl, program_info: ProgramInfo, y_offset: f32) {
-        self.y_offset_= y_offset;
+        self.y_offset_ = y_offset;
         self.renderBoardFrame(gl, program_info, y_offset);
         self.renderGrid(gl, program_info, y_offset);
         self.renderQueue(gl, program_info, y_offset);
         self.renderDumpBlocks(gl, program_info, y_offset);
     }
 
+    /// TODO: old code.
     fn render_queue<Gl>(gl: Gl, program_info: ProgramInfo, y_offset: f32) {
         // Render the queue
         for i in 0..COLUMNS {
@@ -219,6 +228,7 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn render_grid<Gl>(gl: Gl, program_info: ProgramInfo, y_offset: f32) {
         for r in 0..ROWS {
             for c in 0..COLUMNS {
@@ -230,6 +240,7 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn render_dump_blocks<Gl>(gl: Gl, program_info: ProgramInfo, y_offset: f32) {
         // Render any falling blocks
         for item in dump_blocks {
@@ -237,6 +248,7 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn render_board_frame<Gl>(gl: Gl, program_info: ProgramInfo, y_offset: f32) {
         // Declare a shorter name for frame thickness
         let t = self.FRAME_THICKNESS;
@@ -270,6 +282,7 @@ impl Board {
         cube_mesh.render(gl, rx, ry - t, 0, t, t, t);
     }
 
+    /// TODO: old code.
     fn blink_lights(color: i32, count: u8) {
         color = intToRGB(color);
 
@@ -281,15 +294,16 @@ impl Board {
         blinkTime = 0;
     }
 
-    /************************************************
-     * Transfers the block at the given row and
-     * column to the array of falling (dump) blocks.
-     ************************************************/
+    /// Transfers the block at the given row and
+    /// column to the array of falling (dump) blocks.
+    ///
+    /// TODO: old code.
     fn push_block_to_dump(row: i32, col: i32) {
         self.dump_blocks.push(self.board[row][col]);
         self.board[row][col] = null;
     }
 
+    /// TODO: old code.
     fn count_block(block: &Block, data: &mut Data) {
         if (block.color == COLOR_TOXIC) {
             data.lifetime_blocks_by_color.toxic += 1;
@@ -304,10 +318,12 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn to_grid_x(col: i32) {
         self.boardCenter.x - self.width / 2 + (col * (self.BLOCK_WIDTH + self.SPACING))
     }
 
+    /// TODO: old code.
     fn to_grid_y(row: i32) {
         let top = self.boardCenter.y - self.height / 2;
         if (row == -1) {
@@ -320,10 +336,12 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn get_width() {
         self.COLUMNS * (self.BLOCK_WIDTH + self.SPACING) - self.SPACING
     }
 
+    /// TODO: old code.
     fn get_height() {
         // Here we include the block queue at the top, which has
         // double the spacing below it.
@@ -333,6 +351,8 @@ impl Board {
     /// Kicks a block and any matching neighbors out
     /// of the board grid if said matching neighbor(s)
     /// exist. s true if so, and false otherwise.
+    ///
+    /// TODO: old code.
     fn remove_if_matching_neighbors(&self, row: i32, col: i32) -> bool {
         let block = self.board[row][col];
 
@@ -367,6 +387,8 @@ impl Board {
     /// Matches two blocks together given their rows and columns. If the blocks match, the
     /// neighboring blocks will be checked for more matching neighbors, and the fn will
     /// true.
+    ///
+    /// TODO: old code.
     fn match_with_neighbor(
         &self,
         block_to_remove_row: i32,
@@ -394,6 +416,7 @@ impl Board {
         }
     }
 
+    /// TODO: old code.
     fn on_click(&self, mx: i32, my: i32, data: &mut Data) {
         let block_cell_size = BLOCK_WIDTH + BLOCK_GAP;
         let row = ((my - self.board_center.y - self.y_offset_ + (self.height / 2)
