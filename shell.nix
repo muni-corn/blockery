@@ -1,8 +1,12 @@
 { pkgs ? import <nixpkgs> { } }:
+let
+  rust = pkgs.rust-bin.nightly.latest.default;
+in
 with pkgs;
 mkShell {
   buildInputs = [
-    cargo
+    rust
+
     clang
     glibc
     lld
