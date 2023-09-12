@@ -10,10 +10,6 @@ if (!window.ctx2d) alert('This browser does not support canvas drawing');
 if (!window.gl) window.gl = window.glCanvas.getContext('experimental-webgl');
 if (!window.gl) alert('This browser does not support WebGL.');
 
-const VISIBLE_HEIGHT = 1000;
-const VISIBLE_WIDTH = VISIBLE_HEIGHT * 9 / 16;
-const UPDATES_PER_SECOND = 60;
-
 function init() {
 
    let gl = window.gl;
