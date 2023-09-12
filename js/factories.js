@@ -4,9 +4,6 @@
 const COLOR_DISABLED_PURCHASE = 0x002caf;
 const COLOR_DARK_GREEN = 0x009c3c;
 
-const COLOR_DISABLED_PURCHASE = 0x002caf;
-const COLOR_DARK_GREEN = 0x009c3c;
-
 let globalBlockRateMultiplier = 1,
    globalPollutionMultiplier = 1,
    globalCapacityMultiplier = 1,
